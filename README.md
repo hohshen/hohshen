@@ -1,8 +1,8 @@
-### About Me 👋
+### 👋 About Me 
 ---
 Hi everyone, I am Mike Wang, a Cloud Developer (currently working at @ORing)from Taiwan. I like to learn new technologies such as backend development, Container technology. My goal is to become a valuable backend developer and a good sharer which can help others, nice to meet you!
 
-### Skills🌱 
+### 🌱 Skills
 ----
 #### Language
 * TypeScript/ JavaScript
