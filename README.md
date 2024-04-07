@@ -22,7 +22,8 @@ and many other frameworks and tools.
 🔗 Keep in touch
 ---
 * 📫 email: hohshen@gmail.com    
-* 💬 Medium: https://medium.com/@hohshen/about  
+* 💬 Medium: https://medium.com/@hohshen/about
+* 💬 Medium: https://medium.com/@hohshencode
 
 <!--
 **hohshen/hohshen** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
