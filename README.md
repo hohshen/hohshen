@@ -1,41 +1,13 @@
-### 👋 About Me 
----
-Hi everyone, I am Mike Wang, a Cloud Developer (currently working at @ORing)from Taiwan. I like to learn new technologies such as backend development, Container technology. My goal is to become a valuable backend developer and a good sharer which can help others, nice to meet you!
+### 👋 後端里長伯 Hohshen
 
-### 🌱 Skills
-----
-#### Language
-* TypeScript/ JavaScript
-* c/c++
+企業架構師，把架構取捨寫成別人也驗得出來的制度。
+主題：PostgreSQL 與 AI 檢索、AI 開發團隊怎麼建、規格與架構的取捨。COSCUP 連續三年講者。
 
-#### Backend
-* Node.js express/ nestjs   
-and many other frameworks and tools.
-
-#### Container
-* Docker/ Docker-compose
-* Rancher
-* Kubernetes
-* Helm
-* Devspace
+🌐 個人網站：https://hohshen.github.io/hohshen/
 
 🔗 Keep in touch
----
-* 📫 email: hohshen@gmail.com    
-* 💬 Medium: https://medium.com/@hohshen/about
+
+* 📫 email: hohshen@gmail.com
 * 💬 Medium: https://medium.com/@hohshencode
-
-<!--
-**hohshen/hohshen** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-
-Here are some ideas to get you started:
-
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+* 📷 Instagram: https://www.instagram.com/hohshen.backend/
+* 💼 LinkedIn: https://www.linkedin.com/in/hohshen
