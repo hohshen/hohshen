@@ -1,8 +1,14 @@
 <!doctype html>
+<!--
+  後端里長伯 Hohshen 個人站 Rev.9
+  需以 HTTP 伺服（ES module importmap；three / gsap / lenis 已 vendor 在 ./vendor）：
+    cd .site/prototype && python3 -m http.server 8765 → http://localhost:8765/
+-->
 <html lang="zh-Hant-TW">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
 <title>後端里長伯 Hohshen</title>
 <meta name="description" content="後端里長伯 Hohshen（何勝）。企業架構師，寫架構是成本、規格的品味、建立 AI 開發團隊、搜尋演進史；COSCUP 連續三年講者。把架構取捨寫成別人也驗得出來的制度。">
 <meta property="og:type" content="profile">
@@ -14,500 +20,630 @@
 <meta property="og:image:height" content="1199">
 <meta name="twitter:card" content="summary_large_image">
 <meta property="og:locale" content="zh_TW">
-<!-- avoid-ai-design-ignore-file: T7 ；Noto Sans TC 由 Google Fonts 載入，PingFang TC 是系統回退 -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F7F7F5'/%3E%3Crect x='6' y='6' width='20' height='20' fill='none' stroke='%231F4E8C' stroke-width='2'/%3E%3C/svg%3E">
+<!-- avoid-ai-design-ignore-file: T7, SD5 ；T7 字體由 Google Fonts 載入；SD5 是標題逐行遮罩揭示的 span 切行，不是單詞上色 -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2306080F'/%3E%3Ccircle cx='16' cy='22' r='11' fill='%230F1A2E' stroke='%237FC4FF' stroke-width='1.5'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --sp-50:4px;--sp-75:8px;--sp-100:12px;--sp-200:16px;--sp-300:24px;--sp-400:32px;--sp-500:40px;--sp-600:48px;--sp-700:64px;--sp-800:80px;--sp-900:96px;
-  --paper:#F7F7F5;--ink:#24292F;--ink-2:#57606A;--rule:#D0D7DE;--accent:#1F4E8C;
-  color-scheme:light;
+  --void:#06080F;--ice:#DCE8F5;--ice-2:rgba(220,232,245,.62);--ice-3:rgba(220,232,245,.34);
+  --atmo:#7FC4FF;--line:rgba(220,232,245,.12);--surface:rgba(220,232,245,.04);
+  --pad:clamp(20px,5vw,72px);
+  --display:"Bricolage Grotesque","Noto Sans TC","PingFang TC",sans-serif;
+  --text:"Noto Sans TC","PingFang TC",sans-serif;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);--ease-io:cubic-bezier(0.76,0,0.24,1);
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--paper)}
-@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC","PingFang TC",sans-serif;font-size:16px;line-height:26px;font-weight:400;-webkit-font-smoothing:antialiased;text-wrap:pretty}
-h1,h2,h3,p,figure,ul,ol{margin:0}
-h1,h2,h3{text-wrap:balance;font-weight:600}
-h1{font-size:48px;line-height:56px;max-width:680px}
-h2{font-size:30px;line-height:38px}
-h3{font-size:20px;line-height:28px;font-weight:500}
-a{color:var(--accent);text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:3px;transition:text-decoration-color .15s}
-a:hover{text-decoration-color:var(--accent)}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overscroll-behavior:none;scroll-behavior:auto;background:var(--void);color:var(--ice)}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-stopped{overflow:hidden}
+body{font-family:var(--text);font-size:clamp(1rem,.4vw + .85rem,1.125rem);line-height:1.7;-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%;height:auto}
-.small{font-size:14px;line-height:20px;color:var(--ink-2)}
-.num{font-variant-numeric:tabular-nums}
-.btn{display:inline-block;border:1px solid var(--ink);border-radius:2px;padding:var(--sp-75) var(--sp-100);color:var(--ink);text-decoration:none;font-weight:500;background:transparent;transition:background-color .15s,color .15s}
-.btn:hover{background:var(--ink);color:var(--paper)}
-.skip{position:absolute;left:var(--sp-200);top:-100px;background:var(--ink);color:var(--paper);padding:var(--sp-75) var(--sp-100);z-index:100}
-.skip:focus{top:var(--sp-200)}
+::selection{background:var(--atmo);color:var(--void)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--atmo);outline-offset:4px}
 
-/* 版面：第 1 欄留給高度尺，內文第 2 欄，寬表跨 2 到 3 欄 */
-.sheet{display:grid;grid-template-columns:96px minmax(0,760px) minmax(0,264px);max-width:1120px;margin-inline:auto;column-gap:var(--sp-500);padding-inline:var(--sp-300)}
-.sheet>*{grid-column:2}
-.sheet>.wide{grid-column:2/4}
-section{padding-block:var(--sp-800)}
-section+section{border-top:1px solid var(--rule)}
-.alt{display:flex;gap:var(--sp-200);font-size:14px;line-height:20px;color:var(--ink-2);padding-top:var(--sp-100);position:relative;margin-bottom:var(--sp-300)}
-.alt::before{content:"";position:absolute;left:0;top:0;width:48px;height:1px;background:var(--ink)}
-.alt .num{color:var(--ink)}
-.lead{color:var(--ink-2);margin-top:var(--sp-200);max-width:640px}
-.sec-head{margin-bottom:var(--sp-500)}
+/* 字階 */
+.display{font-family:var(--display);font-weight:800;font-variation-settings:"opsz" 96;letter-spacing:-0.02em;line-height:.95;text-wrap:balance}
+.display.zh{letter-spacing:0;font-weight:900;line-height:1.08}
+.h-hero{font-size:clamp(2.6rem,7.6vw,8rem)}
+.h-sec{font-size:clamp(2rem,4.6vw,4.5rem)}
+.h-sub{font-family:var(--display);font-weight:600;font-size:clamp(1.25rem,1.6vw,1.6rem);line-height:1.2;letter-spacing:-0.01em}
+.num{font-family:var(--display);font-weight:800;font-variation-settings:"opsz" 96;letter-spacing:-0.03em;line-height:.9;font-variant-numeric:tabular-nums}
+.lead{font-size:clamp(1.1rem,.6vw + .9rem,1.35rem);line-height:1.65;color:var(--ice-2);max-width:34em}
+.small{font-size:.875rem;line-height:1.5;color:var(--ice-2)}
+.dim{color:var(--ice-3)}
+.link{position:relative;color:var(--ice);transition:color .3s var(--ease-out)}
+.link::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:1px;background:currentColor;transform:scaleX(1);transform-origin:left;transition:transform .5s var(--ease-out)}
+.link:hover{color:var(--atmo)}
+.link:hover::after{transform:scaleX(0);transform-origin:right}
+
+/* 畫布與層 */
+#webgl{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+body.no-webgl #webgl{display:none}
+body.no-webgl{background:radial-gradient(120% 60% at 50% 110%,#13223A 0%,var(--void) 60%)}
+main{position:relative;z-index:1}
+
+/* 載入 */
+#preloader{position:fixed;inset:0;z-index:9000;background:var(--void);display:flex;align-items:flex-end;justify-content:space-between;padding:var(--pad);transition:opacity .8s var(--ease-io),visibility .8s}
+#preloader.done{opacity:0;visibility:hidden}
+#preloader .pct{font-size:clamp(4rem,14vw,12rem)}
+#preloader .pl{align-self:flex-start}
 
 /* 導覽 */
-.nav{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
-.nav .in{max-width:1120px;margin-inline:auto;padding-inline:var(--sp-300);height:48px;display:flex;align-items:center;gap:var(--sp-400)}
-.nav .brand{color:var(--ink);text-decoration:none;font-weight:500}
-.nav ul{list-style:none;display:flex;gap:var(--sp-300);margin:0;padding:0;flex:1}
-.nav ul a{color:var(--ink);text-decoration:none;display:inline-block;line-height:48px}
-.nav ul a[aria-current="true"]{color:var(--accent);box-shadow:inset 0 -2px var(--accent)}
-.nav .cta{text-decoration:none}
-.nav button{display:none;background:none;border:0;padding:0;font:inherit;color:var(--ink);cursor:pointer;margin-left:auto}
-#menu{display:none;position:absolute;left:0;right:0;top:48px;background:var(--paper);border-bottom:1px solid var(--rule)}
-#menu.open{display:block}
-#menu a{display:block;height:48px;line-height:48px;padding-inline:var(--sp-300);border-top:1px solid var(--rule);color:var(--ink);text-decoration:none}
-#menu a.acc{color:var(--accent)}
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:calc(var(--pad) * .5) var(--pad);mix-blend-mode:difference;opacity:0;transform:translateY(-8px);transition:opacity .8s var(--ease-out) .2s,transform .8s var(--ease-out) .2s}
+body.intro-done .nav{opacity:1;transform:none}
+.nav .brand{font-family:var(--display);font-weight:700;font-size:1rem;letter-spacing:-0.01em}
+.nav ul{list-style:none;display:flex;gap:clamp(16px,2.4vw,36px)}
+.nav ul a{font-size:.9rem;color:var(--ice-2);transition:color .3s}
+.nav ul a:hover,.nav ul a[aria-current="true"]{color:var(--ice)}
+.nav .menu-btn{display:none;background:none;border:0;color:var(--ice);font:inherit;font-size:.9rem;cursor:pointer}
+#menu{position:fixed;inset:0;z-index:60;background:var(--void);display:none;flex-direction:column;justify-content:center;padding:var(--pad);gap:8px}
+#menu.open{display:flex}
+#menu a{font-family:var(--display);font-weight:800;font-size:clamp(2.2rem,10vw,4rem);line-height:1.1;opacity:0;transform:translateY(24px);transition:opacity .5s var(--ease-out),transform .5s var(--ease-out)}
+#menu.open a{opacity:1;transform:none}
+#menu .close{position:absolute;top:calc(var(--pad) * .5);right:var(--pad);background:none;border:0;color:var(--ice);font:inherit;cursor:pointer}
+
+/* 游標 */
+.cursor{position:fixed;left:0;top:0;z-index:100;pointer-events:none;mix-blend-mode:difference;display:none}
+.cursor .dot{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:#fff}
+.cursor .ring{position:absolute;left:-20px;top:-20px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.7);transition:transform .4s var(--ease-out),opacity .3s}
+.cursor.on .ring{transform:scale(1.8);opacity:.5}
+@media (pointer:fine){.cursor{display:block}body.has-cursor,body.has-cursor a,body.has-cursor button,body.has-cursor summary{cursor:none}}
+
+/* 共用節 */
+section{position:relative}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:end;margin-bottom:clamp(40px,6vw,96px)}
+.alt{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;color:var(--ice-2);font-size:.9rem}
+.alt b{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--atmo);font-variant-numeric:tabular-nums}
+.alt::before{content:"";width:28px;height:1px;background:var(--atmo);align-self:center}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:16px 26px;border-radius:999px;background:var(--ice);color:var(--void);font-weight:600;font-size:1rem;transition:background-color .3s var(--ease-out),color .3s var(--ease-out)}
+.btn:hover{background:var(--atmo)}
+.btn .arrow{width:18px;height:18px;transition:transform .4s var(--ease-out)}
+.btn:hover .arrow{transform:translateX(4px)}
+.mask{overflow:hidden;display:block}
+.mask>span{display:block;transform:translateY(110%);transition:transform 1.1s var(--ease-out)}
+.in .mask>span,body.intro-done .hero .mask>span{transform:none}
 
 /* hero */
-.hero{display:grid;grid-template-columns:7fr 5fr;gap:var(--sp-500);align-items:start}
-.hero .head{display:flex;gap:var(--sp-300);flex-wrap:wrap;margin-bottom:var(--sp-400)}
-.hero .sub{font-size:18px;line-height:28px;margin-top:var(--sp-300);max-width:640px}
-.hero .act{display:flex;gap:var(--sp-300);align-items:center;margin-top:var(--sp-400);flex-wrap:wrap}
-figure{position:relative}
-figure img{width:100%;aspect-ratio:3/2;object-fit:cover}
-figcaption{margin-top:var(--sp-100);font-size:14px;line-height:20px;color:var(--ink-2)}
-.stamp{position:absolute;right:12px;top:-18px;width:148px;height:48px;transform:rotate(-6deg)}
-.stamp svg{width:100%;height:100%;overflow:visible}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:var(--pad);padding-bottom:clamp(96px,13vh,150px)}
+.hero .kick{display:flex;flex-wrap:wrap;gap:clamp(16px,2vw,32px);margin-bottom:clamp(20px,3vh,36px);color:var(--ice-2);font-size:.95rem}
+.hero h1{max-width:12.5em}
+.hero .row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(24px,4vw,80px);align-items:end;margin-top:clamp(28px,4vh,48px)}
+.hero .acts{justify-self:end}
+.hero .acts>span{display:flex;gap:28px;align-items:center;flex-wrap:wrap}
+.hero .hint{position:absolute;right:var(--pad);top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right center;color:var(--ice-3);font-size:.8rem;letter-spacing:.02em;white-space:nowrap}
+.hero .mask>span{transition-delay:var(--d,0s)}
 
 /* 標語 */
-.manifest{font-size:20px;line-height:32px;padding-left:var(--sp-500)}
+.manifest{padding:clamp(120px,18vh,220px) var(--pad);display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+.manifest p{grid-column:3/12;font-size:clamp(1.5rem,3vw,2.9rem);line-height:1.35;font-weight:500;text-wrap:balance}
+.manifest p .w{opacity:.22;transition:opacity .6s var(--ease-out)}
+.manifest p .w.on{opacity:1}
 
-/* 表 */
-table{width:100%;border-collapse:collapse}
-th{font-size:14px;line-height:20px;color:var(--ink-2);font-weight:500;text-align:left;padding:var(--sp-100) var(--sp-200) var(--sp-100) 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
-td{padding:var(--sp-200) var(--sp-200) var(--sp-200) 0;border-bottom:1px solid var(--rule);vertical-align:top}
-tr:last-child td{border-bottom:1px solid var(--ink)}
-.rec td:first-child{width:160px;font-size:36px;line-height:40px;font-weight:600;white-space:nowrap}
-.rec td:first-child small{font-size:16px;line-height:24px;font-weight:400;margin-left:var(--sp-50)}
-.rec td:nth-child(2){width:38%}
-.rec td:nth-child(3){font-size:14px;line-height:20px;color:var(--ink-2)}
-.rec .first{color:var(--accent)}
-.dec td:first-child{font-weight:500;width:22%}
-.talk td:first-child{width:72px}
-.talk td:nth-child(3){color:var(--ink-2)}
+/* 紀錄：巨大數字 */
+.record{padding:clamp(80px,12vh,160px) var(--pad)}
+.rec{border-top:1px solid var(--line)}
+.rec .r{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr) minmax(0,3fr);gap:24px;align-items:end;padding:clamp(28px,4vh,48px) 0;border-bottom:1px solid var(--line)}
+.rec .n{font-size:clamp(4rem,11vw,10.5rem);color:var(--ice)}
+.rec .n small{font-family:var(--text);font-weight:500;font-size:clamp(1rem,1.6vw,1.5rem);letter-spacing:0;margin-left:.3em;color:var(--ice-2)}
+.rec .r:first-child .n{color:var(--atmo)}
+.rec .l{font-size:clamp(1.15rem,1.6vw,1.5rem);line-height:1.35;font-weight:500}
+.rec .s{color:var(--ice-2);font-size:.9rem;line-height:1.55}
+.rec .s a{color:var(--atmo)}
 
-/* 機制圖 */
-.mech svg{width:100%;height:auto;display:block}
-.mech .g{opacity:0;transition:opacity .4s}
-.mech.in .g{opacity:1}
-.mech.in .g2{transition-delay:.25s}.mech.in .g3{transition-delay:.5s}.mech.in .g4{transition-delay:.75s}.mech.in .g5{transition-delay:1s}
-.steps{padding-left:var(--sp-300);margin-top:var(--sp-500);display:grid;gap:var(--sp-200)}
-.steps li::marker{color:var(--ink-2)}
-.steps b{font-weight:500}
+/* 機制：三步 */
+.how{padding:clamp(80px,12vh,160px) var(--pad)}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,3vw,48px)}
+.step{padding-top:24px;border-top:1px solid var(--line)}
+.step .k{font-family:var(--display);font-weight:700;font-size:.95rem;color:var(--atmo);margin-bottom:18px;font-variant-numeric:tabular-nums}
+.step h3{margin-bottom:10px}
+.step p{color:var(--ice-2)}
+
+/* 取捨：釘住橫向 */
+.decisions{overflow:hidden}
+.decisions .sec-head{padding:clamp(80px,12vh,160px) var(--pad) 0}
+.track{display:flex;gap:clamp(20px,2.5vw,40px);padding:0 var(--pad) clamp(80px,12vh,160px);will-change:transform}
+.dossier{flex:0 0 min(76vw,720px);padding:clamp(28px,3.5vw,48px);border:1px solid var(--line);border-radius:28px;background:rgba(6,8,15,.74)}
+.dossier .no{font-family:var(--display);font-weight:800;font-size:clamp(2.5rem,5vw,4.5rem);line-height:1;color:var(--ice-3);margin-bottom:24px;font-variant-numeric:tabular-nums}
+.dossier h3{font-size:clamp(1.5rem,2.4vw,2.2rem);margin-bottom:28px}
+.dossier dl{display:grid;gap:18px}
+.dossier dt{font-size:.85rem;color:var(--atmo);margin-bottom:4px}
+.dossier dd{color:var(--ice-2);line-height:1.6}
+.track .end{flex:0 0 20vw}
 
 /* 寫作線 */
-.lines{list-style:none;padding:0;border-top:1px solid var(--ink)}
-.lines li{display:grid;grid-template-columns:1fr auto;gap:var(--sp-400);padding-block:var(--sp-300);border-bottom:1px solid var(--rule);align-items:start}
-.lines li:last-child{border-bottom:1px solid var(--ink)}
-.lines p{margin-top:var(--sp-50)}
-.lines .take{font-size:14px;line-height:20px;color:var(--ink-2);margin-top:var(--sp-75)}
-.lines .st{font-size:14px;line-height:20px;color:var(--ink-2);white-space:nowrap;padding-top:var(--sp-50)}
-.lines .st a{white-space:nowrap}
+.writing{padding:clamp(80px,12vh,160px) var(--pad)}
+.lines{list-style:none;border-top:1px solid var(--line)}
+.lines a,.lines .row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) auto;gap:clamp(16px,3vw,48px);align-items:baseline;padding:clamp(24px,3.5vh,40px) 0;border-bottom:1px solid var(--line);transition:padding-left .6s var(--ease-out)}
+.lines li:hover a,.lines li:hover .row{padding-left:16px}
+.lines h3{font-size:clamp(1.6rem,3.4vw,3.2rem);transition:color .4s}
+.lines li:hover h3{color:var(--atmo)}
+.lines p{color:var(--ice-2)}
+.lines .take{display:block;margin-top:6px;font-size:.9rem;color:var(--ice-3)}
+.lines .st{font-size:.9rem;color:var(--ice-2);white-space:nowrap}
+.lines .st.live{color:var(--atmo)}
 
-/* 演講圖版 */
-.plates{display:grid;grid-template-columns:7fr 5fr;gap:var(--sp-300);margin-bottom:var(--sp-500)}
-.plates .col{display:grid;gap:var(--sp-300)}
-.plates .tall img{aspect-ratio:auto;height:100%;object-position:50% 35%}
+/* 演講 */
+.talks{padding:clamp(80px,12vh,160px) var(--pad)}
+.plates{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-bottom:clamp(48px,8vh,96px)}
+.plates figure{position:relative;overflow:hidden;border-radius:18px;background:var(--surface)}
+.plates figure img{width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform 1.2s var(--ease-out)}
+.plates figure:hover img{transform:scale(1)}
+.plates figcaption{position:absolute;left:18px;right:18px;bottom:16px;display:flex;justify-content:space-between;gap:12px;font-size:.9rem;color:#fff;text-shadow:0 1px 12px rgba(0,0,0,.6)}
+.plates figcaption b{font-family:var(--display);font-weight:700}
+.plates .p1{grid-column:1/8;aspect-ratio:4/3}
+.plates .p2{grid-column:8/13;aspect-ratio:4/5;margin-top:clamp(40px,8vh,120px)}
+.plates .p3{grid-column:3/8;aspect-ratio:16/10;margin-top:-10vh}
+.tbl{border-top:1px solid var(--line)}
+.tbl .tr{display:grid;grid-template-columns:120px minmax(0,1.4fr) minmax(0,1fr) auto;gap:clamp(16px,3vw,48px);align-items:baseline;padding:clamp(20px,3vh,32px) 0;border-bottom:1px solid var(--line)}
+.tbl .y{font-size:clamp(2rem,4vw,3.6rem);color:var(--ice-3);transition:color .4s}
+.tbl .t{font-size:clamp(1.15rem,1.7vw,1.6rem);font-weight:500}
+.tbl .v{color:var(--ice-2)}
+.tbl .tr:hover .y{color:var(--atmo)}
 
 /* 關於 */
-.about{display:grid;grid-template-columns:7fr 5fr;gap:var(--sp-500)}
-.bio{display:grid;grid-template-columns:160px 1fr;gap:var(--sp-300);align-items:start}
-.bio figure img{aspect-ratio:2/3}
-.bio p+p{margin-top:var(--sp-200)}
-.faq details{border-bottom:1px solid var(--rule)}
-.faq details:first-child{border-top:1px solid var(--ink)}
-.faq summary{list-style:none;cursor:pointer;padding-block:var(--sp-200);font-weight:500;display:flex;justify-content:space-between;gap:var(--sp-200)}
+.about{padding:clamp(80px,12vh,160px) var(--pad);display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+.about .bio{grid-column:1/7;display:grid;grid-template-columns:150px minmax(0,1fr);gap:28px;align-items:start}
+.about .bio img{border-radius:14px;aspect-ratio:2/3;object-fit:cover}
+.about .bio p+p{margin-top:14px}
+.about .faq{grid-column:8/13}
+.faq details{border-bottom:1px solid var(--line)}
+.faq details:first-child{border-top:1px solid var(--line)}
+.faq summary{list-style:none;cursor:pointer;padding:22px 0;font-weight:500;font-size:1.05rem;display:flex;justify-content:space-between;gap:16px;align-items:center}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"+";color:var(--ink-2)}
-.faq details[open] summary::after{content:"−"}
-.faq .a{padding-bottom:var(--sp-200);color:var(--ink)}
+.faq summary::after{content:"";width:12px;height:12px;flex:none;border-right:1px solid var(--ice-2);border-bottom:1px solid var(--ice-2);transform:rotate(45deg);transition:transform .5s var(--ease-out)}
+.faq details[open] summary::after{transform:rotate(225deg)}
+.faq .a{padding-bottom:22px;color:var(--ice-2);max-width:36em}
 
 /* 對接 */
-.dock{border-top:2px solid var(--ink);padding-top:var(--sp-500)}
-.dock p{margin-top:var(--sp-200);max-width:560px}
-.dock .btn{margin-top:var(--sp-300)}
+.dock{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:var(--pad)}
+.dock h2{max-width:11em}
+.dock .row{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-top:clamp(32px,5vh,64px);flex-wrap:wrap}
+.dock p{max-width:30em;color:var(--ice-2)}
+footer{position:relative;z-index:1;padding:48px var(--pad) 40px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px;border-top:1px solid var(--line);font-size:.875rem;color:var(--ice-2)}
+footer .l{grid-column:1/7}footer .r{grid-column:9/13;display:grid;gap:8px;align-content:start}
+footer .r a{width:max-content}
+footer .rev{margin-top:14px;display:grid;gap:4px;color:var(--ice-3)}
 
-/* 頁尾 */
-footer{border-top:1px solid var(--rule);padding-block:var(--sp-600)}
-.foot{display:grid;grid-template-columns:8fr 4fr;gap:var(--sp-500);font-size:14px;line-height:20px;color:var(--ink-2)}
-.foot td{padding:var(--sp-75) var(--sp-200) var(--sp-75) 0;font-size:14px;line-height:20px}
-.foot td:first-child,.foot td:nth-child(2){white-space:nowrap}
-.foot .who{display:grid;gap:var(--sp-75);align-content:start}
-.foot .who b{color:var(--ink);font-weight:500}
+/* 高度讀數 */
+.hud{position:fixed;left:var(--pad);bottom:calc(var(--pad) * .6);z-index:40;display:flex;align-items:baseline;gap:12px;mix-blend-mode:difference;opacity:0;transition:opacity .8s var(--ease-out) .4s}
+body.intro-done .hud{opacity:1}
+.hud b{font-family:var(--display);font-weight:800;font-size:1.4rem;font-variant-numeric:tabular-nums;min-width:6ch}
+.hud span{font-size:.85rem;color:var(--ice-2)}
 
-/* 高度尺 */
-.scale{position:fixed;left:24px;top:50%;transform:translateY(-50%);width:64px;z-index:10}
-.scale svg{width:64px;height:520px;display:block;overflow:visible}
-.scale #ptr{transition:transform .2s linear}
-.scale .now{font-size:14px;line-height:20px;margin-top:var(--sp-100);color:var(--ink-2);white-space:nowrap}
-.scale .now b{display:block;color:var(--ink);font-weight:500}
-@media (prefers-reduced-motion: reduce){.mech .g{opacity:1;transition:none}.scale #ptr{transition:none}}
-
-@media (max-width:1240px){.scale{display:none}}
+@media (prefers-reduced-motion: reduce){
+  .mask>span{transform:none !important;transition:none}
+  .manifest p .w{opacity:1}
+  .nav,.hud{opacity:1;transform:none;transition:none}
+}
 @media (max-width:960px){
-  .sheet{grid-template-columns:1fr}
-  .sheet>*,.sheet>.wide{grid-column:1}
-  .hero,.about,.plates,.foot{grid-template-columns:1fr}
-  .plates .tall img{aspect-ratio:3/2;height:auto}
+  .sec-head,.about{grid-template-columns:1fr}
+  .about .bio,.about .faq{grid-column:1/-1}
+  .steps{grid-template-columns:1fr}
+  .rec .r{grid-template-columns:1fr;gap:10px}
+  .manifest p{grid-column:1/-1}
+  .plates .p1{grid-column:1/13}.plates .p2{grid-column:5/13;margin-top:0}.plates .p3{grid-column:1/9;margin-top:0}
+  .tbl .tr{grid-template-columns:80px minmax(0,1fr)}
+  .tbl .v,.tbl .lk{grid-column:2}
+  .lines a,.lines .row{grid-template-columns:1fr}
+  footer .l,footer .r{grid-column:1/-1}
 }
 @media (max-width:720px){
-  section{padding-block:var(--sp-600)}
-  h1{font-size:30px;line-height:38px}
-  h2{font-size:24px;line-height:32px}
   .nav ul,.nav .cta{display:none}
-  .nav button{display:block}
-  .manifest{font-size:18px;line-height:28px;padding-left:var(--sp-300)}
-  .rec td:first-child{font-size:30px;line-height:36px;width:auto}
-  .rec tr,.dec tr{display:block;padding-block:var(--sp-200);border-bottom:1px solid var(--rule)}
-  .rec td,.dec td,.rec td:first-child,.dec td:first-child,.rec td:nth-child(2){display:block;padding:var(--sp-50) 0;border:0;width:auto}
-  .rec thead,.dec thead{display:none}
-  .dec td::before{content:attr(data-label);display:block;font-size:14px;line-height:20px;color:var(--ink-2)}
-  .rec tr:last-child,.dec tr:last-child{border-bottom:1px solid var(--ink)}
-  .rec tbody,.dec tbody{display:block;border-top:1px solid var(--ink)}
-  .rec tr:last-child td,.dec tr:last-child td{border-bottom:0}
-  .lines li{grid-template-columns:1fr}
-  .bio{grid-template-columns:120px 1fr}
-  .stamp{transform:rotate(-6deg) scale(.75);transform-origin:top right;right:4px;top:-12px}
+  .nav .menu-btn{display:block}
+  .hero .row{grid-template-columns:1fr}
+  .hero .acts{justify-self:start}
+  .hero .hint{display:none}
+  .track{flex-direction:column;padding-bottom:clamp(60px,10vh,120px)}
+  .dossier{flex-basis:auto}
+  .track .end{display:none}
+  .about .bio{grid-template-columns:110px 1fr}
+  .hud{display:none}
 }
 </style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/",
+    "gsap": "./vendor/gsap/index.js",
+    "gsap/ScrollTrigger": "./vendor/gsap/ScrollTrigger.js",
+    "lenis": "./vendor/lenis/lenis.mjs"
+  }
+}
+</script>
+<script>
+window.addEventListener('error', function(e){ console.error('[site]', e.message); });
+window.addEventListener('unhandledrejection', function(e){ console.error('[site] unhandled', e.reason); });
+</script>
 </head>
 <body>
-<a class="skip" href="#main">跳到內容</a>
+
+<div id="preloader" aria-hidden="true">
+  <div class="pl small">後端里長伯 Hohshen<br>發射前檢查</div>
+  <div class="pct num" id="pct">0</div>
+</div>
+
+<canvas id="webgl" aria-hidden="true"></canvas>
+<div class="cursor" id="cursor" aria-hidden="true"><div class="ring"></div><div class="dot"></div></div>
 
 <nav class="nav" aria-label="主導覽">
-  <div class="in">
-    <a class="brand" href="#top">後端里長伯</a>
-    <ul>
-      <li><a href="#writing">寫作</a></li>
-      <li><a href="#talks">演講</a></li>
-      <li><a href="#decisions">取捨</a></li>
-      <li><a href="#about">關於</a></li>
-    </ul>
-    <a class="cta" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請合作</a>
-    <button type="button" aria-expanded="false" aria-controls="menu">目錄</button>
-  </div>
-  <div id="menu">
-    <a href="#writing">寫作</a>
-    <a href="#talks">演講</a>
-    <a href="#decisions">取捨</a>
-    <a href="#about">關於</a>
-    <a class="acc" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請合作</a>
-  </div>
+  <a class="brand" href="#top">Hohshen</a>
+  <ul>
+    <li><a href="#writing">寫作</a></li>
+    <li><a href="#talks">演講</a></li>
+    <li><a href="#decisions">取捨</a></li>
+    <li><a href="#about">關於</a></li>
+  </ul>
+  <a class="cta link" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請合作</a>
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">目錄</button>
 </nav>
+<div id="menu" aria-hidden="true">
+  <button class="close" type="button">關閉</button>
+  <a href="#writing" style="transition-delay:.05s">寫作</a>
+  <a href="#talks" style="transition-delay:.1s">演講</a>
+  <a href="#decisions" style="transition-delay:.15s">取捨</a>
+  <a href="#about" style="transition-delay:.2s">關於</a>
+  <a href="mailto:hohshen@gmail.com?subject=邀請演講或合作" style="transition-delay:.25s;color:var(--atmo)">邀請合作</a>
+</div>
 
-<aside class="scale" aria-hidden="true">
-  <svg id="scaleSvg" viewBox="0 0 64 520"></svg>
-  <p class="now num"><b id="nowKm">0 km</b><span id="nowName">發射台</span></p>
-</aside>
+<div class="hud" aria-hidden="true"><b id="hudKm">0 km</b><span id="hudName">發射台</span></div>
 
-<main id="main" class="sheet">
+<main id="main">
 
-<!-- hero -->
-<section class="wide" id="top" style="border-top:0">
-  <div class="hero">
-    <div class="text">
-      <p class="head small"><span>後端里長伯 Hohshen</span><span>企業架構師</span><span>COSCUP 連續三年講者</span></p>
-      <h1>把架構取捨，寫成別人也驗得出來的制度。</h1>
-      <p class="sub">我是後端里長伯 Hohshen，製造業的企業架構師。白天把核心系統從總部接到工廠、把 AI 從概念驗證送進全公司日常營運的軌道；晚上把這些取捨寫成文章與演講。這一頁上的每個數字，旁邊都有出處。</p>
-      <p class="act"><a class="btn" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請我演講或合作</a><a href="#writing">看四條寫作線</a></p>
-    </div>
-    <figure>
-      <img src="img/film-mopcon.jpg" alt="後端里長伯在 MOPCON 2025 舞台上拿麥克風演講，背景投影片是後端里長伯的 Instagram 與 Medium" width="1800" height="1199">
-      <figcaption>圖 1　MOPCON 2025，台上。台上講的東西，都是公司裡先跑過一輪的。</figcaption>
-      <div class="stamp" aria-hidden="true"><svg id="stampSvg" viewBox="0 0 148 48"></svg></div>
-    </figure>
+<section class="hero" id="top">
+  <p class="kick"><span class="mask"><span style="--d:.1s">後端里長伯 Hohshen</span></span><span class="mask"><span style="--d:.18s">企業架構師</span></span><span class="mask"><span style="--d:.26s">COSCUP 連續三年講者</span></span></p>
+  <h1 class="display zh h-hero"><span class="mask"><span style="--d:.3s">把架構取捨，</span></span><span class="mask"><span style="--d:.42s">寫成別人也驗得出來的制度。</span></span></h1>
+  <div class="row">
+    <p class="lead mask"><span style="--d:.7s">我是後端里長伯 Hohshen，製造業的企業架構師。白天把核心系統從總部接到工廠、把 AI 從概念驗證送進全公司日常營運的軌道；晚上把這些取捨寫成文章與演講。這一頁上的每個數字，旁邊都有出處。</span></p>
+    <div class="acts mask"><span style="--d:.9s"><a class="btn magnet" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請我演講或合作<svg class="arrow" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9h12M10 4l5 5-5 5"/></svg></a><a class="link" href="#writing">看四條寫作線</a></span></div>
   </div>
+  <div class="hint">往下捲，離開地面</div>
 </section>
 
-<!-- 標語 -->
-<section>
-  <p class="manifest">我擅長的不是追工具，是做取捨。自建或採購，哪些判斷交給機器，哪些留給人。這些取捨最後都要寫成別人也驗得出來的東西，不然只是我的品味。</p>
+<section class="manifest" id="manifest">
+  <p data-words>我擅長的不是追工具，是做取捨。自建或採購，哪些判斷交給機器，哪些留給人。這些取捨最後都要寫成別人也驗得出來的東西，不然只是我的品味。</p>
 </section>
 
-<!-- 0 km 紀錄表 -->
-<section class="wide" id="record">
+<section class="record" id="record" data-km="0" data-name="發射台">
   <div class="sec-head">
-    <p class="alt" data-km="0" data-name="發射台"><span class="num">0 km</span><span>發射台</span></p>
-    <h2>實戰紀錄，附出處</h2>
+    <div><p class="alt"><b>0 km</b>發射台</p><h2 class="display zh h-sec"><span class="mask"><span>實戰紀錄，附出處</span></span></h2></div>
     <p class="lead">我寫的每一篇、講的每一場，素材都從這裡起飛。數字只抄不算；出處兩態：媒體報導附公開連結、內部資料面談可說明。</p>
   </div>
-  <table class="rec">
-    <thead><tr><th>數字</th><th>事項</th><th>出處</th></tr></thead>
-    <tbody>
-      <tr><td class="num first">99<small>%</small></td><td>同仁每月都在用的 AI 數位員工</td><td>人均每月委派約 6 件任務；依營運、法務、技術分三個角色。內部資料，面談可說明</td></tr>
-      <tr><td class="num">19<small>個模組</small></td><td>企業入口平台，總部簽核到工廠生產循環</td><td>多數核心系統由我設計並完成；起步 3 人 5 個月交付 5 套，原估 1 年。內部資料</td></tr>
-      <tr><td class="num">10<small>萬盞</small></td><td>智慧路燈平台支撐的設備數</td><td><a href="https://news.ltn.com.tw/news/life/breakingnews/3686912" target="_blank" rel="noopener">專案整體年省約 1.53 億電費，自由時報報導</a></td></tr>
-      <tr><td class="num">121<small>%</small></td><td>QA 數位員工讓測試情境成長的幅度</td><td>跨 6 個系統 12 階段；受控文件模組檢查全數通過，較期限提前四週。內部資料</td></tr>
-      <tr><td class="num">1/10</td><td>常規審查成本降到的比例</td><td>統計 22 次設計流程的 AI 花費後，改為自動檢查先過濾，判不了的才開多模型審查。內部資料</td></tr>
-      <tr><td class="num">5<small>種協定</small></td><td>特權存取管理平台，單一介面管理多雲資產</td><td><a href="https://techorange.com/2023/03/17/cloudmile-pentium-network-mavis/" target="_blank" rel="noopener">SSH、RDP、SFTP、PostgreSQL、Web Sandbox，TechOrange 報導</a></td></tr>
-    </tbody>
-  </table>
+  <div class="rec">
+    <div class="r"><div class="n num">99<small>%</small></div><div class="l">同仁每月都在用的 AI 數位員工</div><div class="s">人均每月委派約 6 件任務；依營運、法務、技術分三個角色。內部資料，面談可說明</div></div>
+    <div class="r"><div class="n num">19<small>個模組</small></div><div class="l">企業入口平台，總部簽核到工廠生產循環</div><div class="s">多數核心系統由我設計並完成；起步 3 人 5 個月交付 5 套，原估 1 年。內部資料</div></div>
+    <div class="r"><div class="n num">10<small>萬盞</small></div><div class="l">智慧路燈平台支撐的設備數</div><div class="s"><a class="link" href="https://news.ltn.com.tw/news/life/breakingnews/3686912" target="_blank" rel="noopener">專案整體年省約 1.53 億電費，自由時報報導</a></div></div>
+    <div class="r"><div class="n num">121<small>%</small></div><div class="l">QA 數位員工讓測試情境成長的幅度</div><div class="s">跨 6 個系統 12 階段；受控文件模組檢查全數通過，較期限提前四週。內部資料</div></div>
+    <div class="r"><div class="n num">1/10</div><div class="l">常規審查成本降到的比例</div><div class="s">統計 22 次設計流程的 AI 花費後，改為自動檢查先過濾，判不了的才開多模型審查。內部資料</div></div>
+    <div class="r"><div class="n num">5<small>種協定</small></div><div class="l">特權存取管理平台，單一介面管理多雲資產</div><div class="s"><a class="link" href="https://techorange.com/2023/03/17/cloudmile-pentium-network-mavis/" target="_blank" rel="noopener">SSH、RDP、SFTP、PostgreSQL、Web Sandbox，TechOrange 報導</a></div></div>
+  </div>
 </section>
 
-<!-- 50 km 機制圖 -->
-<section id="how">
+<section class="how" id="how" data-km="50" data-name="平流層頂">
   <div class="sec-head">
-    <p class="alt" data-km="50" data-name="平流層頂"><span class="num">50 km</span><span>平流層頂</span></p>
-    <h2>每一篇怎麼來的</h2>
+    <div><p class="alt"><b>50 km</b>平流層頂</p><h2 class="display zh h-sec"><span class="mask"><span>每一篇怎麼來的</span></span></h2></div>
     <p class="lead">沒上線過的不講。三步，缺一步就不發。</p>
   </div>
-  <figure class="mech" id="mech">
-    <svg id="mechSvg" viewBox="0 0 760 320" role="img" aria-label="機制圖：概念驗證從地面升空，進入全公司日常營運的軌道反覆運行，再向外廣播成文章與演講"></svg>
-    <figcaption>圖 2　從地面送進軌道，再廣播出去。每一篇、每一場都走這條路。</figcaption>
-  </figure>
-  <ol class="steps">
-    <li><b>公司裡先跑一輪。</b>題目一定先在真的系統上做過：核心系統、AI 數位員工、QA 自動化。</li>
-    <li><b>寫成取捨紀錄。</b>每個決定填四欄：為什麼、為什麼不、撤銷條件、出處。填不出撤銷條件的，代表還沒想清楚。</li>
-    <li><b>上台或發文，附出處。</b>只用驗得出來的數字。有公開連結就連，沒有就標內部資料，面談可追問。</li>
-  </ol>
+  <div class="steps">
+    <div class="step"><div class="k">Step 1</div><h3 class="h-sub">公司裡先跑一輪</h3><p>題目一定先在真的系統上做過：核心系統、AI 數位員工、QA 自動化。</p></div>
+    <div class="step"><div class="k">Step 2</div><h3 class="h-sub">寫成取捨紀錄</h3><p>每個決定填四欄：為什麼、為什麼不、撤銷條件、出處。填不出撤銷條件的，代表還沒想清楚。</p></div>
+    <div class="step"><div class="k">Step 3</div><h3 class="h-sub">上台或發文，附出處</h3><p>只用驗得出來的數字。有公開連結就連，沒有就標內部資料，面談可追問。</p></div>
+  </div>
 </section>
 
-<!-- 100 km 取捨表 -->
-<section class="wide" id="decisions">
+<section class="decisions" id="decisions" data-km="100" data-name="卡門線">
   <div class="sec-head">
-    <p class="alt" data-km="100" data-name="卡門線"><span class="num">100 km</span><span>卡門線</span></p>
-    <h2>取捨紀錄</h2>
+    <div><p class="alt"><b>100 km</b>卡門線</p><h2 class="display zh h-sec"><span class="mask"><span>取捨紀錄</span></span></h2></div>
     <p class="lead">卡門線是大氣層與太空的分界。AI 專案能不能離開概念驗證，差別不在技術，在這幾個取捨有沒有寫成制度。這也是我每篇文章的骨架。</p>
   </div>
-  <table class="dec">
-    <thead><tr><th scope="col">決定</th><th scope="col">為什麼</th><th scope="col">為什麼不選另一邊</th><th scope="col">撤銷條件</th></tr></thead>
-    <tbody>
-      <tr><td data-label="決定">AI 核心採購，流程與驗收自建</td><td data-label="為什麼">AI 迭代速度過快，自建核心追不上大廠。</td><td data-label="為什麼不選另一邊">自建核心會把人力耗在追版本，而公司的差異在任務流程與驗收規則。</td><td data-label="撤銷條件">採購產品無法承載公司的驗收規則，或成本結構反轉。</td></tr>
-      <tr><td data-label="決定">自動檢查先過濾，多模型審查殿後</td><td data-label="為什麼">22 次流程統計，近半花費在讓多個 AI 互相審查。</td><td data-label="為什麼不選另一邊">全靠多模型審查品質好但貴；全靠規則會漏掉需要語意判斷的題目。</td><td data-label="撤銷條件">自動檢查的漏判率高到下游修復成本超過省下的審查費。</td></tr>
-      <tr><td data-label="決定">測試情境是唯一規格來源</td><td data-label="為什麼">E2E 測試從情境自動產生，失敗先分系統缺陷或測試錯誤。</td><td data-label="為什麼不選另一邊">手寫測試會與規格漂移，兩份正本永遠對不上。</td><td data-label="撤銷條件">情境描述無法表達的驗證需求佔比上升。</td></tr>
-    </tbody>
-  </table>
+  <div class="track" id="track">
+    <article class="dossier"><div class="no">1 / 3</div><h3 class="display zh">AI 核心採購，流程與驗收自建</h3><dl><div><dt>為什麼</dt><dd>AI 迭代速度過快，自建核心追不上大廠。</dd></div><div><dt>為什麼不選另一邊</dt><dd>自建核心會把人力耗在追版本，而公司的差異在任務流程與驗收規則。</dd></div><div><dt>撤銷條件</dt><dd>採購產品無法承載公司的驗收規則，或成本結構反轉。</dd></div></dl></article>
+    <article class="dossier"><div class="no">2 / 3</div><h3 class="display zh">自動檢查先過濾，多模型審查殿後</h3><dl><div><dt>為什麼</dt><dd>22 次流程統計，近半花費在讓多個 AI 互相審查。</dd></div><div><dt>為什麼不選另一邊</dt><dd>全靠多模型審查品質好但貴；全靠規則會漏掉需要語意判斷的題目。</dd></div><div><dt>撤銷條件</dt><dd>自動檢查的漏判率高到下游修復成本超過省下的審查費。</dd></div></dl></article>
+    <article class="dossier"><div class="no">3 / 3</div><h3 class="display zh">測試情境是唯一規格來源</h3><dl><div><dt>為什麼</dt><dd>E2E 測試從情境自動產生，失敗先分系統缺陷或測試錯誤。</dd></div><div><dt>為什麼不選另一邊</dt><dd>手寫測試會與規格漂移，兩份正本永遠對不上。</dd></div><div><dt>撤銷條件</dt><dd>情境描述無法表達的驗證需求佔比上升。</dd></div></dl></article>
+    <div class="end"></div>
+  </div>
 </section>
 
-<!-- 400 km 寫作線 -->
-<section id="writing">
+<section class="writing" id="writing" data-km="400" data-name="低地軌道">
   <div class="sec-head">
-    <p class="alt" data-km="400" data-name="低地軌道"><span class="num">400 km</span><span>低地軌道</span></p>
-    <h2>四條寫作線</h2>
+    <div><p class="alt"><b>400 km</b>低地軌道</p><h2 class="display zh h-sec"><span class="mask"><span>四條寫作線</span></span></h2></div>
     <p class="lead">入軌之後就是持續運行。每條線各回答一個問題，你拿到的是方法與帳本，不是結論。篇數與狀態如實標示。</p>
   </div>
   <ul class="lines">
-    <li><div><h3>架構是成本</h3><p>每個架構決定都算維運、認知與換掉它的代價。先算帳再選，不先選再找理由。</p><p class="take">你會帶走：一張架構的帳</p></div><span class="st">6 篇，撰寫中</span></li>
-    <li><div><h3>規格的品味</h3><p>「做到什麼算完成」怎麼寫到 PM、工程師與 AI 看同一份。附我在公司裡用的交付閘門。</p><p class="take">你會帶走：一份驗得出來的規格</p></div><span class="st">4 篇，撰寫中</span></li>
-    <li><div><h3>建立 AI 開發團隊</h3><p>自建或採購、哪些判斷交給機器、哪些留給人。全公司 99% 同仁每月在用的體系怎麼長出來的。</p><p class="take">你會帶走：一套 AI 落地的取捨</p></div><span class="st">系列，撰寫中</span></li>
-    <li><div><h3>搜尋演進史</h3><p>倒排索引到向量、GraphRAG、SAG。每一代解決了什麼、又把什麼留給下一代，用 PostgreSQL 實作。</p><p class="take">你會帶走：一條搜尋技術的演進線</p></div><span class="st">10 篇，撰寫中</span></li>
-    <li><div><h3>CRUD 仔的一生</h3><p>30 篇。ACID、鎖、MVCC、WAL、查詢優化、索引結構、資料分割與讀寫分離。</p><p class="take">已公開：iThome 鐵人賽 2023</p></div><span class="st"><a href="https://ithelp.ithome.com.tw/users/20163269/ironman/6881" target="_blank" rel="noopener">閱讀 30 篇</a></span></li>
+    <li><div class="row"><h3 class="display zh">架構是成本</h3><p>每個架構決定都算維運、認知與換掉它的代價。先算帳再選，不先選再找理由。<span class="take">你會帶走：一張架構的帳</span></p><span class="st">6 篇，撰寫中</span></div></li>
+    <li><div class="row"><h3 class="display zh">規格的品味</h3><p>「做到什麼算完成」怎麼寫到 PM、工程師與 AI 看同一份。附我在公司裡用的交付閘門。<span class="take">你會帶走：一份驗得出來的規格</span></p><span class="st">4 篇，撰寫中</span></div></li>
+    <li><div class="row"><h3 class="display zh">建立 AI 開發團隊</h3><p>自建或採購、哪些判斷交給機器、哪些留給人。全公司 99% 同仁每月在用的體系怎麼長出來的。<span class="take">你會帶走：一套 AI 落地的取捨</span></p><span class="st">系列，撰寫中</span></div></li>
+    <li><div class="row"><h3 class="display zh">搜尋演進史</h3><p>倒排索引到向量、GraphRAG、SAG。每一代解決了什麼、又把什麼留給下一代，用 PostgreSQL 實作。<span class="take">你會帶走：一條搜尋技術的演進線</span></p><span class="st">10 篇，撰寫中</span></div></li>
+    <li><a href="https://ithelp.ithome.com.tw/users/20163269/ironman/6881" target="_blank" rel="noopener"><h3 class="display zh">CRUD 仔的一生</h3><p>30 篇。ACID、鎖、MVCC、WAL、查詢優化、索引結構、資料分割與讀寫分離。<span class="take">已公開：iThome 鐵人賽 2023</span></p><span class="st live">閱讀 30 篇</span></a></li>
   </ul>
 </section>
 
-<!-- 36,000 km 演講 -->
-<section class="wide" id="talks">
+<section class="talks" id="talks" data-km="36000" data-name="同步軌道">
   <div class="sec-head">
-    <p class="alt" data-km="36000" data-name="同步軌道"><span class="num">36,000 km</span><span>同步軌道</span></p>
-    <h2>演講</h2>
+    <div><p class="alt"><b>36,000 km</b>同步軌道</p><h2 class="display zh h-sec"><span class="mask"><span>演講</span></span></h2></div>
     <p class="lead">同步軌道上的衛星負責廣播。公司裡驗證過的做法，透過演講往外送；2024 至 2026 共 12 場，COSCUP 連續三年，JSDC 與 MOPCON 付費講師。</p>
   </div>
   <div class="plates">
-    <figure class="tall"><img src="img/talk-coscup24.jpg" alt="後端里長伯在 COSCUP 2024 講台上，背景投影片是探索 PG Vector" width="1200" height="802"><figcaption>圖 3　COSCUP 2024，講台上。投影片是探索 PG Vector。</figcaption></figure>
-    <div class="col">
-      <figure><img src="img/talk-coscup26.jpg" alt="後端里長伯在 COSCUP 2026 與 UbuCon Asia 的主視覺牆前" width="1200" height="800"><figcaption>圖 4　COSCUP 2026 與 UbuCon Asia 主視覺牆前，連續第三年。</figcaption></figure>
-      <figure><img src="img/talk-devfest.jpg" alt="後端里長伯在 DevFest 2024 的 Google Developer Groups 背板前" width="698" height="390"><figcaption>圖 5　DevFest 2024，GDG 背板前。</figcaption></figure>
-    </div>
+    <figure class="p1" data-speed="0.06"><img src="img/film-mopcon.jpg" alt="後端里長伯在 MOPCON 2025 舞台上拿麥克風演講，背景投影片是後端里長伯的 Instagram 與 Medium" width="1800" height="1199"><figcaption><span>MOPCON，付費講師</span><b>2025</b></figcaption></figure>
+    <figure class="p2" data-speed="-0.08"><img src="img/talk-coscup26.jpg" alt="後端里長伯在 COSCUP 2026 與 UbuCon Asia 的主視覺牆前" width="1200" height="800"><figcaption><span>COSCUP，連續第三年</span><b>2026</b></figcaption></figure>
+    <figure class="p3" data-speed="0.04"><img src="img/talk-coscup24.jpg" alt="後端里長伯在 COSCUP 2024 講台上，背景投影片是探索 PG Vector" width="1200" height="802"><figcaption><span>COSCUP，PG Vector 與 RAG</span><b>2024</b></figcaption></figure>
   </div>
-  <table class="talk">
-    <thead><tr><th>年</th><th>題目</th><th>場次</th><th>連結</th></tr></thead>
-    <tbody>
-      <tr><td class="num">2026</td><td>以 PostgreSQL 驅動 SAG 動態超邊推論引擎</td><td>COSCUP</td><td><a href="https://coscup.org/2026/session/NHBKPE" target="_blank" rel="noopener">議程</a></td></tr>
-      <tr><td class="num">2025</td><td>打造會記憶的 AI Codebase 理解引擎</td><td>COSCUP、TAIDE、MOPCON、JSDC 巡迴四場</td><td><a href="https://coscup.org/2025/sessions/CAD9S3" target="_blank" rel="noopener">議程</a></td></tr>
-      <tr><td class="num">2025</td><td>MCP 與 A2A 協定</td><td>Postgres Taiwan 小講堂</td><td><a href="https://www.youtube.com/watch?v=NeUdvqI0gnY" target="_blank" rel="noopener">錄影</a></td></tr>
-      <tr><td class="num">2024</td><td>PG Vector 與多模態檢索</td><td>COSCUP、GDG Taipei、DevFest 高雄與台中、JSDC 巡迴五場</td><td><a href="https://www.youtube.com/watch?v=jT-A18wTBHM" target="_blank" rel="noopener">錄影</a></td></tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- 地面站 關於 -->
-<section class="wide" id="about">
-  <div class="sec-head">
-    <p class="alt" data-km="ground" data-name="通訊"><span>地面站</span><span>通訊</span></p>
-    <h2>關於我</h2>
-    <p class="lead">何勝，網路上叫後端里長伯。製造業的企業架構師，負責企業系統與 AI 導入的架構決策與交付制度。</p>
-  </div>
-  <div class="about">
-    <div class="bio">
-      <figure><img src="img/portrait.jpg" alt="後端里長伯的大頭照" width="516" height="766"><figcaption>圖 6　大頭照。</figcaption></figure>
-      <div>
-        <p>之前做過資安產品的特權存取管理平台，更早在系統整合公司帶 5 至 8 人團隊，設計過支撐近 10 萬盞設備的智慧路燈平台。</p>
-        <p class="small">三個產業共通的是高併發資料與跨部門交付。主力是 TypeScript、PostgreSQL、Kubernetes 與 LLM 周邊。國立臺北大學資訊工程學系。</p>
-      </div>
-    </div>
-    <div class="faq">
-      <details><summary>找你演講，可以講什麼？</summary><p class="a">PostgreSQL 與 AI 檢索（pgvector、GraphRAG、SAG）、AI 開發團隊怎麼建、規格與架構的取捨。每一場的素材都是公司裡先跑過一輪的。</p></details>
-      <details><summary>用什麼語言講？</summary><p class="a">中文。投影片中英混排。</p></details>
-      <details><summary>文章什麼時候公開？</summary><p class="a">鐵人賽 30 篇已公開。四條線的稿件已定稿，公開後連結會補在寫作區。</p></details>
-      <details><summary>「內部資料」的數字怎麼驗？</summary><p class="a">聊的時候我會說明量法與分母：模組怎麼數、覆蓋率怎麼算、測試情境成長的起訖點。可以追問到任何一個數字的來源。</p></details>
-      <details><summary>怎麼聯絡？</summary><p class="a">寄信到 hohshen@gmail.com，標題寫邀請演講或合作，內文一句話說明場合與題目方向即可。</p></details>
-    </div>
+  <div class="tbl">
+    <div class="tr"><div class="y num">2026</div><div class="t">以 PostgreSQL 驅動 SAG 動態超邊推論引擎</div><div class="v">COSCUP</div><a class="link lk" href="https://coscup.org/2026/session/NHBKPE" target="_blank" rel="noopener">議程</a></div>
+    <div class="tr"><div class="y num">2025</div><div class="t">打造會記憶的 AI Codebase 理解引擎</div><div class="v">COSCUP、TAIDE、MOPCON、JSDC 巡迴四場</div><a class="link lk" href="https://coscup.org/2025/sessions/CAD9S3" target="_blank" rel="noopener">議程</a></div>
+    <div class="tr"><div class="y num">2025</div><div class="t">MCP 與 A2A 協定</div><div class="v">Postgres Taiwan 小講堂</div><a class="link lk" href="https://www.youtube.com/watch?v=NeUdvqI0gnY" target="_blank" rel="noopener">錄影</a></div>
+    <div class="tr"><div class="y num">2024</div><div class="t">PG Vector 與多模態檢索</div><div class="v">COSCUP、GDG Taipei、DevFest 高雄與台中、JSDC 巡迴五場</div><a class="link lk" href="https://www.youtube.com/watch?v=jT-A18wTBHM" target="_blank" rel="noopener">錄影</a></div>
   </div>
 </section>
 
-<!-- 對接 -->
-<section id="dock">
-  <div class="dock">
-    <h2>有一場演講、一個題目，想一起把它寫成制度？</h2>
+<section class="about" id="about" data-km="ground" data-name="通訊">
+  <div class="bio">
+    <img src="img/portrait.jpg" alt="後端里長伯的大頭照" width="516" height="766">
+    <div>
+      <p class="alt"><b>地面站</b>通訊</p>
+      <h2 class="display zh" style="font-size:clamp(1.8rem,3vw,2.8rem);margin-bottom:18px">關於我</h2>
+      <p>何勝，網路上叫後端里長伯。製造業的企業架構師，負責企業系統與 AI 導入的架構決策與交付制度。</p>
+      <p class="small">之前做過資安產品的特權存取管理平台，更早在系統整合公司帶 5 至 8 人團隊，設計過支撐近 10 萬盞設備的智慧路燈平台。三個產業共通的是高併發資料與跨部門交付。主力是 TypeScript、PostgreSQL、Kubernetes 與 LLM 周邊。國立臺北大學資訊工程學系。</p>
+    </div>
+  </div>
+  <div class="faq">
+    <details><summary>找你演講，可以講什麼？</summary><p class="a">PostgreSQL 與 AI 檢索（pgvector、GraphRAG、SAG）、AI 開發團隊怎麼建、規格與架構的取捨。每一場的素材都是公司裡先跑過一輪的。</p></details>
+    <details><summary>用什麼語言講？</summary><p class="a">中文。投影片中英混排。</p></details>
+    <details><summary>文章什麼時候公開？</summary><p class="a">鐵人賽 30 篇已公開。四條線的稿件已定稿，公開後連結會補在寫作區。</p></details>
+    <details><summary>「內部資料」的數字怎麼驗？</summary><p class="a">聊的時候我會說明量法與分母：模組怎麼數、覆蓋率怎麼算、測試情境成長的起訖點。可以追問到任何一個數字的來源。</p></details>
+    <details><summary>怎麼聯絡？</summary><p class="a">寄信到 hohshen@gmail.com，標題寫邀請演講或合作，內文一句話說明場合與題目方向即可。</p></details>
+  </div>
+</section>
+
+<section class="dock" id="dock">
+  <p class="alt"><b>對接</b>Docking</p>
+  <h2 class="display zh" style="font-size:clamp(2.2rem,6vw,6rem)"><span class="mask"><span>有一場演講、一個題目，想一起把它寫成制度？</span></span></h2>
+  <div class="row">
     <p>寄信時寫一句場合與題目方向就好。我會在兩個工作日內回覆。</p>
-    <a class="btn" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請我演講或合作</a>
+    <a class="btn magnet" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請我演講或合作<svg class="arrow" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9h12M10 4l5 5-5 5"/></svg></a>
   </div>
 </section>
 
 </main>
 
 <footer>
-  <div class="sheet">
-    <div class="wide foot">
-      <div>
-        <table>
-          <thead><tr><th>日期</th><th>版本</th><th>修訂</th></tr></thead>
-          <tbody>
-            <tr><td class="num">2026-11-03</td><td>Rev.8</td><td>視覺語言第三版：受控工程文件。淺色紙底、單一藍墨強調色、Noto Sans TC 單家族、表格與圖版、手繪高度尺與機制圖；拿掉星空、行星、軌道、毛玻璃、文字漸層、逐段淡入與數字跑動</td></tr>
-            <tr><td class="num">2026-11-03</td><td>Rev.7</td><td>第二輪獨立審查後修正：高度計章內定高、卡門線事件同拍、手機星圖移到標題下、og 絕對網址、出處兩態</td></tr>
-            <tr><td class="num">2026-11-03</td><td>Rev.6.1</td><td>網路上只用後端里長伯與何勝，站上真名全部移除</td></tr>
-            <tr><td class="num">2026-11-02</td><td>Rev.6</td><td>第一輪獨立審查後修正；補社群連結、移除未定案問答</td></tr>
-            <tr><td class="num">2026-11-02</td><td>Rev.5</td><td>視覺語言第二版：火焰橘、襯線大標、行星與軌道環</td></tr>
-            <tr><td class="num">2026-11-02</td><td>Rev.2</td><td>定位改為個人品牌；主題改為 AI 衝出大氣層</td></tr>
-            <tr><td class="num">2026-11-02</td><td>Rev.1</td><td>prototype 首版，事實正本為履歷 2026-09-29 版</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="who">
-        <b>後端里長伯 Hohshen（何勝）</b>
-        <a href="mailto:hohshen@gmail.com">hohshen@gmail.com</a>
-        <a href="https://www.linkedin.com/in/hohshen" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://www.instagram.com/hohshen.backend/" target="_blank" rel="noopener">Instagram hohshen.backend</a>
-        <a href="https://medium.com/@hohshencode" target="_blank" rel="noopener">Medium</a>
-        <a href="https://github.com/hohshen" target="_blank" rel="noopener">GitHub</a>
-        <span>本站為靜態頁面，不使用 cookie，不蒐集任何資料。</span>
-      </div>
+  <div class="l">
+    <div>後端里長伯 Hohshen（何勝）</div>
+    <div class="rev">
+      <span>Rev.9，2026-11-03：改以 Three.js 實作地球升軌、ACES 調色、bloom 與顆粒；Lenis 平滑捲動；Bricolage Grotesque 與 Noto Sans TC</span>
+      <span>Rev.8，2026-11-03：受控工程文件版（已撤）</span>
+      <span>Rev.5 到 Rev.7，2026-11-02 至 03：火焰橘與行星軌道版（已撤）</span>
+      <span>Rev.1，2026-11-02：首版，事實正本為履歷 2026-09-29 版</span>
+      <span>本站為靜態頁面，不使用 cookie，不蒐集任何資料。</span>
     </div>
+  </div>
+  <div class="r">
+    <a class="link" href="mailto:hohshen@gmail.com">hohshen@gmail.com</a>
+    <a class="link" href="https://www.linkedin.com/in/hohshen" target="_blank" rel="noopener">LinkedIn</a>
+    <a class="link" href="https://www.instagram.com/hohshen.backend/" target="_blank" rel="noopener">Instagram</a>
+    <a class="link" href="https://medium.com/@hohshencode" target="_blank" rel="noopener">Medium</a>
+    <a class="link" href="https://github.com/hohshen" target="_blank" rel="noopener">GitHub</a>
   </div>
 </footer>
 
-<script src="rough.js"></script>
-<script>
-(function(){
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var css = getComputedStyle(document.documentElement), V = function(n){ return css.getPropertyValue(n).trim(); };
-  var INK = V('--ink'), INK2 = V('--ink-2'), ACC = V('--accent'), PAPER = V('--paper');
-  var NS = 'http://www.w3.org/2000/svg';
-  function txt(svg, x, y, t, sz, color, weight, anchor){ var e = document.createElementNS(NS, 'text'); e.setAttribute('x', x); e.setAttribute('y', y); e.setAttribute('font-size', sz); e.setAttribute('fill', color || INK); if (weight) e.setAttribute('font-weight', weight); if (anchor) e.setAttribute('text-anchor', anchor); e.setAttribute('font-family', '"Noto Sans TC","PingFang TC",sans-serif'); e.textContent = t; svg.appendChild(e); return e; }
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 
-  /* 手機選單 */
-  var tg = document.querySelector('.nav button'), menu = document.getElementById('menu');
-  function setMenu(open){ tg.setAttribute('aria-expanded', String(open)); menu.classList.toggle('open', open); }
-  tg.addEventListener('click', function(){ setMenu(tg.getAttribute('aria-expanded') !== 'true'); });
-  menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ setMenu(false); }); });
+gsap.registerPlugin(ScrollTrigger);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fine = matchMedia('(pointer: fine)').matches;
+const mobile = matchMedia('(max-width: 720px)').matches;
+const DPR = Math.min(devicePixelRatio, mobile ? 1.5 : 2);
 
-  /* 受控章 */
-  var st = document.getElementById('stampSvg');
-  if (st && window.rough){ var rs = rough.svg(st);
-    st.appendChild(rs.rectangle(1, 1, 146, 46, { stroke: ACC, strokeWidth: 1.6, roughness: .8, seed: 11, fill: PAPER, fillStyle: 'solid' }));
-    st.appendChild(rs.rectangle(5, 5, 138, 38, { stroke: ACC, strokeWidth: 1, roughness: .8, seed: 12 }));
-    txt(st, 74, 29, '受控文件 Rev.8', 14, ACC, 600, 'middle'); }
+/* ── WebGL 偵測 ── */
+function hasWebGL(){ try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); return !!gl; } catch(e){ return false; } }
+const webgl = hasWebGL();
+if (!webgl) document.body.classList.add('no-webgl');
 
-  /* 高度尺：五站等距，400 與 36,000 之間畫斷尺記號 */
-  var sc = document.getElementById('scaleSvg'), ptr = null;
-  var stations = [{ km: 0, y: 16, label: '0 km' }, { km: 50, y: 138, label: '50' }, { km: 100, y: 260, label: '100' }, { km: 400, y: 382, label: '400' }, { km: 36000, y: 504, label: '36,000' }];
-  if (sc && window.rough){ var rc = rough.svg(sc);
-    sc.appendChild(rc.line(40, 16, 40, 430, { stroke: INK, strokeWidth: 1.4, roughness: 1, seed: 21 }));
-    sc.appendChild(rc.line(40, 456, 40, 504, { stroke: INK, strokeWidth: 1.4, roughness: 1, seed: 22 }));
-    sc.appendChild(rc.linearPath([[40, 430], [34, 437], [46, 449], [40, 456]], { stroke: INK, strokeWidth: 1.4, roughness: .9, seed: 23 }));
-    stations.forEach(function(s, i){
-      sc.appendChild(rc.line(30, s.y, 40, s.y, { stroke: INK, strokeWidth: 1.4, roughness: .8, seed: 30 + i }));
-      txt(sc, 26, s.y + 4, s.label, 12, INK2, null, 'end').setAttribute('font-variant-numeric', 'tabular-nums');
-      if (i < 3) for (var k = 1; k < 4; k++){ var yy = s.y + (stations[i + 1].y - s.y) * k / 4; sc.appendChild(rc.line(36, yy, 40, yy, { stroke: INK2, strokeWidth: 1, roughness: .6, seed: 40 + i * 4 + k })); }
-    });
-    var g = document.createElementNS(NS, 'g'); g.id = 'ptr';
-    g.appendChild(rc.polygon([[46, 0], [56, -5], [56, 5]], { fill: ACC, fillStyle: 'solid', stroke: 'none', roughness: .6, seed: 50 }));
-    g.style.transform = 'translateY(16px)'; sc.appendChild(g); ptr = g; }
+/* ── 場景 ── */
+let composer, renderer, camera, scene, planet, atmo, ring, sat, stars, grainPass, planetMat, running = true, rafId = 0;
+const state = {
+  camY:   { current: 0.15, target: 0.15, ease: 0.06 },
+  camZ:   { current: mobile ? 4.2 : 3.4,  target: mobile ? 4.2 : 3.4,  ease: 0.06 },
+  lookY:  { current: mobile ? 1.4 : 1.05, target: mobile ? 1.4 : 1.05, ease: 0.06 },
+  lookX:  { current: 0, target: 0, ease: 0.06 },
+  mouseX: { current: 0, target: 0, ease: 0.1 },
+  mouseY: { current: 0, target: 0, ease: 0.1 },
+  ringA:  { current: 0, target: 0, ease: 0.08 },
+};
+function damp(s, dt){ const f = 1 - Math.pow(1 - s.ease, dt * 60); s.current += (s.target - s.current) * f; }
 
-  /* 機制圖：地面 → 升空 → 繞行 → 廣播。桌機橫式、手機直式同一支 draw */
-  var ms = document.getElementById('mechSvg');
-  function drawMech(mobile){
-    if (!ms || !window.rough) return; while (ms.firstChild) ms.removeChild(ms.firstChild);
-    var W = mobile ? 360 : 760, H = mobile ? 480 : 320; ms.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    var rc = rough.svg(ms), fs = mobile ? 14 : 16;
-    var L = mobile
-      ? { groundY: 450, box: [24, 392, 130, 48], curve: [[154, 416], [196, 350], [204, 280]], orb: [240, 235, 112], arcs: [240, 235], arcR: [50, 80, 110], arcDir: 'up', paper: [40, 24], screen: [150, 14] }
-      : { groundY: 290, box: [40, 222, 150, 56], curve: [[190, 250], [320, 150], [412, 112]], orb: [470, 110, 116], arcs: [528, 110], arcR: [60, 95, 130], arcDir: 'right', paper: [690, 60], screen: [690, 140] };
-    function G(cls){ var g = document.createElementNS(NS, 'g'); g.setAttribute('class', 'g ' + cls); ms.appendChild(g); return g; }
-    function arrowHead(g, x1, y1, x2, y2, seed){ var a = Math.atan2(y2 - y1, x2 - x1), Ln = 14; [-.45, .45].forEach(function(d, k){ g.appendChild(rc.line(x2, y2, x2 - Ln * Math.cos(a + d), y2 - Ln * Math.sin(a + d), { stroke: INK, strokeWidth: 1.6, roughness: .8, seed: seed + k })); }); }
-    var g1 = G('g1');
-    g1.appendChild(rc.line(0, L.groundY, W, L.groundY, { stroke: INK2, strokeWidth: 1.2, roughness: 1.6, seed: 61 }));
-    g1.appendChild(rc.rectangle(0, L.groundY, W, 14, { fill: INK2, fillStyle: 'hachure', hachureGap: 6, hachureAngle: 60, stroke: 'none', roughness: 1.2, seed: 62 }));
-    txt(g1, 8, L.groundY + 32, '地面', fs, INK2);
-    var g2 = G('g2'), b = L.box;
-    g2.appendChild(rc.rectangle(b[0], b[1], b[2], b[3], { stroke: INK, strokeWidth: 1.6, roughness: 1.3, seed: 63 }));
-    txt(g2, b[0] + b[2] / 2, b[1] + b[3] / 2 + fs * .36, '概念驗證', fs, INK, null, 'middle');
-    var g3 = G('g3'), c = L.curve;
-    g3.appendChild(rc.curve(c, { stroke: INK, strokeWidth: 1.6, roughness: 1.2, seed: 64 }));
-    arrowHead(g3, c[1][0], c[1][1], c[2][0], c[2][1], 65);
-    txt(g3, mobile ? c[1][0] + 12 : c[1][0] - 10, mobile ? c[1][1] + 6 : c[1][1] - 14, '上線', fs, INK2, null, mobile ? 'start' : 'end');
-    var g4 = G('g4'), o = L.orb;
-    g4.appendChild(rc.circle(o[0], o[1], o[2], { stroke: INK, strokeWidth: 1.8, roughness: 1.3, seed: 66 }));
-    g4.appendChild(rc.circle(o[0], o[1], 10, { fill: INK, fillStyle: 'solid', stroke: 'none', seed: 67 }));
-    g4.appendChild(rc.arc(o[0], o[1], o[2] - 30, o[2] - 30, -Math.PI * .9, Math.PI * .75, false, { stroke: INK2, strokeWidth: 1.2, roughness: 1, seed: 68 }));
-    var ax = o[0] + (o[2] / 2 - 15) * Math.cos(Math.PI * .75), ay = o[1] + (o[2] / 2 - 15) * Math.sin(Math.PI * .75);
-    arrowHead(g4, ax - 6, ay - 10, ax, ay, 69);
-    txt(g4, o[0], o[1] + o[2] / 2 + fs + (mobile ? 16 : 6), '全公司日常營運', fs, INK, null, 'middle');
-    var g5 = G('g5'), A = L.arcs, up = L.arcDir === 'up';
-    L.arcR.forEach(function(r, i){ var a0 = up ? -Math.PI * .5 - .7 : -.7, a1 = up ? -Math.PI * .5 + .7 : .7; g5.appendChild(rc.arc(A[0], A[1], r * 2, r * 2, a0, a1, false, { stroke: INK2, strokeWidth: 1.4, roughness: 1.1, seed: 70 + i })); });
-    var p = L.paper; g5.appendChild(rc.rectangle(p[0], p[1], 48, 36, { stroke: INK, strokeWidth: 1.4, roughness: 1.2, seed: 74, fill: PAPER, fillStyle: 'solid' }));
-    [8, 16, 24].forEach(function(dy, i){ g5.appendChild(rc.line(p[0] + 8, p[1] + dy, p[0] + 40 - (i === 2 ? 14 : 0), p[1] + dy, { stroke: INK2, strokeWidth: 1, roughness: .8, seed: 75 + i })); });
-    txt(g5, p[0] + 24, p[1] + 52, '文章', fs - 2, INK2, null, 'middle');
-    var s = L.screen; g5.appendChild(rc.rectangle(s[0], s[1], 48, 30, { stroke: INK, strokeWidth: 1.4, roughness: 1.2, seed: 78, fill: PAPER, fillStyle: 'solid' }));
-    g5.appendChild(rc.line(s[0] + 24, s[1] + 30, s[0] + 24, s[1] + 40, { stroke: INK, strokeWidth: 1.2, roughness: .8, seed: 79 }));
-    g5.appendChild(rc.line(s[0] + 12, s[1] + 46, s[0] + 36, s[1] + 46, { stroke: INK, strokeWidth: 1.2, roughness: .8, seed: 80 }));
-    txt(g5, s[0] + 24, s[1] + 62, '演講', fs - 2, INK2, null, 'middle');
+if (webgl){
+  const canvas = document.getElementById('webgl');
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance', stencil: false });
+  renderer.setPixelRatio(DPR); renderer.setSize(innerWidth, innerHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+
+  scene = new THREE.Scene(); scene.background = new THREE.Color(0x06080f);
+  camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 0.05, 200);
+  camera.position.set(0, state.camY.current, state.camZ.current);
+
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; pmrem.dispose();
+
+  const sun = new THREE.DirectionalLight(0xffd9a8, 1.9); sun.position.set(4, 1.2, -2.5);
+  const fill = new THREE.DirectionalLight(0x7fc4ff, 0.35); fill.position.set(-4, 2, 3);
+  scene.add(sun, fill);
+
+  const stage = new THREE.Group(); scene.add(stage);
+
+  planetMat = new THREE.MeshStandardMaterial({ color: 0x070c16, roughness: 0.94, metalness: 0.0, envMapIntensity: 0.22 });
+  planetMat.onBeforeCompile = (sh) => {
+    sh.uniforms.uTime = { value: 0 }; planetMat.userData.sh = sh;
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vPos;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvPos = position;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vPos;\nfloat hash3(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,37.719))) * 43758.5453); }\nfloat vnoise(vec3 p){ vec3 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(mix(hash3(i),hash3(i+vec3(1,0,0)),f.x),mix(hash3(i+vec3(0,1,0)),hash3(i+vec3(1,1,0)),f.x),f.y),mix(mix(hash3(i+vec3(0,0,1)),hash3(i+vec3(1,0,1)),f.x),mix(hash3(i+vec3(0,1,1)),hash3(i+vec3(1,1,1)),f.x),f.y),f.z); }')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n float land = smoothstep(0.52, 0.62, vnoise(vPos * 3.1) * 0.6 + vnoise(vPos * 7.3) * 0.4);\n float city = smoothstep(0.86, 0.995, vnoise(vPos * 320.0)) * land * smoothstep(0.3, 0.7, vnoise(vPos * 24.0));\n totalEmissiveRadiance += vec3(1.0, 0.74, 0.45) * city * 1.4;\n diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.035, 0.05, 0.075), land * 0.55);');
+  };
+  planet = new THREE.Mesh(new THREE.SphereGeometry(1, 128, 128), planetMat); stage.add(planet);
+
+  const atmoMat = new THREE.ShaderMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.FrontSide,
+    uniforms: { uColor: { value: new THREE.Color(0x7fc4ff) }, uPower: { value: 3.2 }, uIntensity: { value: 1.35 } },
+    vertexShader: `varying vec3 vNormal; varying vec3 vViewPosition; void main(){ vNormal = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vViewPosition = -mv.xyz; gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: `precision mediump float; uniform vec3 uColor; uniform float uPower; uniform float uIntensity; varying vec3 vNormal; varying vec3 vViewPosition; void main(){ vec3 N = normalize(vNormal); vec3 V = normalize(vViewPosition); float rim = pow(1.0 - max(dot(N, V), 0.0), uPower); gl_FragColor = vec4(uColor * rim * uIntensity, rim); }` });
+  atmo = new THREE.Mesh(new THREE.SphereGeometry(1.028, 96, 96), atmoMat); stage.add(atmo);
+
+  ring = new THREE.Mesh(new THREE.TorusGeometry(1.62, 0.0022, 8, 360), new THREE.MeshBasicMaterial({ color: 0xdce8f5, transparent: true, opacity: 0.16 }));
+  ring.rotation.x = Math.PI * 0.5 + 0.28; ring.rotation.y = 0.35; stage.add(ring);
+  sat = new THREE.Mesh(new THREE.SphereGeometry(0.014, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffffff })); stage.add(sat);
+  sat.add(new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 16), new THREE.MeshBasicMaterial({ color: 0x7fc4ff, transparent: true, opacity: 0.22 })));
+
+  const COUNT = mobile ? 1800 : 4200, pos = new Float32Array(COUNT * 3), sz = new Float32Array(COUNT);
+  for (let i = 0; i < COUNT; i++){ const r = 22 + Math.random() * 60, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1); pos[i*3] = r * Math.sin(ph) * Math.cos(th); pos[i*3+1] = r * Math.sin(ph) * Math.sin(th); pos[i*3+2] = r * Math.cos(ph); sz[i] = 0.6 + Math.random() * 1.6; }
+  const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); sg.setAttribute('size', new THREE.BufferAttribute(sz, 1));
+  stars = new THREE.Points(sg, new THREE.ShaderMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+    uniforms: { uTime: { value: 0 }, uPR: { value: DPR } },
+    vertexShader: `attribute float size; uniform float uTime; uniform float uPR; varying float vA; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv; gl_PointSize = size * uPR * (90.0 / -mv.z); vA = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * 0.6 + position.x * 3.0 + position.y)); }`,
+    fragmentShader: `precision mediump float; varying float vA; void main(){ vec2 uv = gl_PointCoord - 0.5; float d = length(uv); float c = smoothstep(0.5, 0.05, d); gl_FragColor = vec4(vec3(0.86, 0.91, 0.96) * c, c * vA); }` }));
+  scene.add(stars);
+
+  const hdr = new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType });
+  composer = new EffectComposer(renderer, hdr); composer.setPixelRatio(DPR); composer.setSize(innerWidth, innerHeight);
+  composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), mobile ? 0.3 : 0.55, 0.45, 0.78));
+  composer.addPass(new ShaderPass({ uniforms: { tDiffuse: { value: null } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `uniform sampler2D tDiffuse; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); float v = smoothstep(0.95, 0.35, length(vUv - 0.5)); gl_FragColor = vec4(mix(c.rgb * 0.45, c.rgb, v), c.a); }` }));
+  composer.addPass(new OutputPass());
+  if (!mobile){ grainPass = new ShaderPass({ uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uI: { value: 0.045 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `uniform sampler2D tDiffuse; uniform float uTime; uniform float uI; varying vec2 vUv; float rnd(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); } void main(){ vec4 c = texture2D(tDiffuse, vUv); gl_FragColor = vec4(c.rgb + (rnd(vUv + fract(uTime)) - 0.5) * uI, c.a); }` }); composer.addPass(grainPass); }
+
+  addEventListener('mousemove', (e) => { state.mouseX.target = (e.clientX / innerWidth) * 2 - 1; state.mouseY.target = -((e.clientY / innerHeight) * 2 - 1); }, { passive: true });
+  let rp = false; addEventListener('resize', () => { if (rp) return; rp = true; requestAnimationFrame(() => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); rp = false; }); });
+  const clock = new THREE.Clock();
+  document.addEventListener('visibilitychange', () => { if (document.hidden){ running = false; cancelAnimationFrame(rafId); } else if (!running){ running = true; clock.getDelta(); tick(); } });
+
+  function tick(){
+    if (!running) return;
+    const dt = Math.min(clock.getDelta(), 0.1), t = clock.elapsedTime;
+    for (const k in state) damp(state[k], dt);
+    camera.position.x = state.mouseX.current * 0.12;
+    camera.position.y = state.camY.current + state.mouseY.current * 0.06;
+    camera.position.z = state.camZ.current;
+    camera.lookAt(state.lookX.current, state.lookY.current, 0);
+    planet.rotation.y = t * 0.02; atmo.rotation.copy(planet.rotation);
+    stars.rotation.y = t * 0.004; stars.material.uniforms.uTime.value = t;
+    const a = state.ringA.current + t * 0.12, rr = 1.62;
+    sat.position.set(Math.cos(a) * rr, 0, Math.sin(a) * rr).applyEuler(ring.rotation);
+    if (planetMat.userData.sh) planetMat.userData.sh.uniforms.uTime.value = t;
+    if (grainPass) grainPass.uniforms.uTime.value = t;
+    composer.render();
+    rafId = requestAnimationFrame(tick);
   }
-  var mq = window.matchMedia('(max-width: 720px)');
-  drawMech(mq.matches);
-  mq.addEventListener('change', function(e){ drawMech(e.matches); });
-  var mech = document.getElementById('mech');
-  if (mech){ if (reduce || !('IntersectionObserver' in window)) mech.classList.add('in');
-    else { var mio = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ mech.classList.add('in'); mio.unobserve(mech); } }); }, { threshold: .3 }); mio.observe(mech); } }
+  renderer.compile(scene, camera);
+  tick();
+  window.__scene = { state, camera };
+}
 
-  /* 高度尺指標：站與站之間按像素插值；36,000 到地面站不插值 */
-  var alts = Array.prototype.map.call(document.querySelectorAll('.alt[data-km]'), function(el){ return { el: el.closest('section'), km: el.getAttribute('data-km'), name: el.getAttribute('data-name') }; });
-  var nowKm = document.getElementById('nowKm'), nowName = document.getElementById('nowName');
-  function fmt(v){ return (v >= 1000 ? Math.round(v).toLocaleString('en-US') : String(Math.round(v))) + ' km'; }
-  function yFor(km){ for (var i = 0; i < stations.length - 1; i++){ var a = stations[i], b = stations[i + 1]; if (km >= a.km && km <= b.km){ var t = (km - a.km) / (b.km - a.km); return a.y + (b.y - a.y) * t; } } return km > 36000 ? 504 : 16; }
-  var ticking = false, lastKm = -1;
-  function onScroll(){
-    if (ticking) return; ticking = true;
-    requestAnimationFrame(function(){
-      var mid = window.scrollY + window.innerHeight * .5, cur = null, ci = -1;
-      alts.forEach(function(a, i){ if (a.el && a.el.offsetTop <= mid){ cur = a; ci = i; } });
-      var km = 0, name = '發射台', label = '0 km', ground = false;
-      if (cur){ name = cur.name; if (cur.km === 'ground'){ ground = true; km = 0; label = '地面站'; } else { km = parseFloat(cur.km); var nxt = alts[ci + 1]; if (nxt && nxt.el && nxt.km !== 'ground'){ var a = cur.el.offsetTop + cur.el.offsetHeight * .7, b = nxt.el.offsetTop, p = b > a ? Math.min(1, Math.max(0, (mid - a) / (b - a))) : 0; if (p > 0){ km = km + (parseFloat(nxt.km) - km) * p; name = '轉移軌道'; } } label = fmt(km); } }
-      if (nowKm) nowKm.textContent = label; if (nowName) nowName.textContent = name;
-      if (ptr){ var y = ground ? 16 : yFor(km); ptr.style.transform = 'translateY(' + y.toFixed(1) + 'px)'; }
-      ticking = false;
-    });
+/* ── Lenis + ScrollTrigger ── */
+let lenis = null;
+if (!reduce){
+  lenis = new Lenis({ duration: 1.15, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true, prevent: () => false });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time) => lenis.raf(time * 1000)); gsap.ticker.lagSmoothing(0);
+}
+document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', (e) => { const el = document.querySelector(a.getAttribute('href')); if (!el) return; e.preventDefault(); if (lenis) lenis.scrollTo(el, { offset: 0 }); else el.scrollIntoView(); }));
+
+/* 相機隨捲動升軌 */
+if (webgl){
+  const prog = { p: 0 };
+  function applyProg(p){
+    state.camZ.target = (mobile ? 4.2 : 3.4) + p * 5.6;
+    state.camY.target = 0.15 + p * 0.45;
+    state.lookY.target = (mobile ? 1.4 : 1.05) * (1 - p);
+    state.lookX.target = mobile ? 0 : -Math.min(1, p * 3) * 2.6 * (camera.aspect / 1.6);
+    state.ringA.target = p * 2.2;
   }
-  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  gsap.to(prog, { p: 1, ease: 'none', scrollTrigger: { trigger: '#manifest', endTrigger: '#talks', start: 'top bottom', end: 'bottom bottom', scrub: true, onUpdate: () => applyProg(prog.p) } });
+  ScrollTrigger.create({ trigger: '#about', start: 'top bottom', end: 'bottom bottom', scrub: true, onUpdate: (self) => { state.camZ.target = 9 + self.progress * 1.5; state.camY.target = 0.6 - self.progress * 0.9; state.lookY.target = 0; state.lookX.target = mobile ? 0 : -2.6 * (1 - self.progress) * (camera.aspect / 1.6); } });
+  if (reduce) applyProg(0.5);
+}
 
-  /* 導覽目前章節 */
-  var links = document.querySelectorAll('.nav ul a');
-  if ('IntersectionObserver' in window){ var sio = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ links.forEach(function(a){ a.setAttribute('aria-current', a.getAttribute('href') === '#' + e.target.id ? 'true' : 'false'); }); } }); }, { rootMargin: '-40% 0px -50% 0px' });
-    links.forEach(function(a){ var el = document.getElementById(a.getAttribute('href').slice(1)); if (el) sio.observe(el); }); }
-})();
+/* 取捨：釘住橫向捲 */
+if (!mobile && !reduce){
+  const track = document.getElementById('track');
+  const dist = () => track.scrollWidth - innerWidth;
+  gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: '#decisions', start: 'top top', end: () => '+=' + dist(), pin: true, scrub: 1, invalidateOnRefresh: true, anticipatePin: 1 } });
+}
+
+/* 照片輕微視差 */
+if (!mobile && !reduce){
+  document.querySelectorAll('.plates figure').forEach((f) => { const s = parseFloat(f.dataset.speed || 0); gsap.fromTo(f, { y: () => -s * 400 }, { y: () => s * 400, ease: 'none', scrollTrigger: { trigger: '.plates', start: 'top bottom', end: 'bottom top', scrub: true } }); });
+}
+
+/* 標題遮罩揭示：只對標題，一次 */
+const io = new IntersectionObserver((es) => { es.forEach((e) => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -12% 0px' });
+document.querySelectorAll('.sec-head, .dock').forEach((el) => io.observe(el));
+
+/* 標語逐句亮起 */
+const tl = document.querySelector('[data-words]');
+if (tl){ const txt = tl.textContent; tl.textContent = ''; txt.split(/(?<=[，。；])/).forEach((w) => { const s = document.createElement('span'); s.className = 'w'; s.textContent = w; tl.appendChild(s); });
+  const ws = tl.querySelectorAll('.w'); if (reduce) ws.forEach(s => s.classList.add('on')); else { const wio = new IntersectionObserver((es) => { es.forEach((e) => { if (e.isIntersecting){ const i = [...ws].indexOf(e.target); setTimeout(() => e.target.classList.add('on'), i * 90); wio.unobserve(e.target); } }); }, { rootMargin: '0px 0px -35% 0px' }); ws.forEach(s => wio.observe(s)); } }
+
+/* 高度讀數 */
+const secs = [...document.querySelectorAll('section[data-km]')].map(el => ({ el, km: el.dataset.km, name: el.dataset.name }));
+const hudKm = document.getElementById('hudKm'), hudName = document.getElementById('hudName');
+const fmt = (v) => (v >= 1000 ? Math.round(v).toLocaleString('en-US') : String(Math.round(v))) + ' km';
+let hudTick = false;
+function onScroll(){ if (hudTick) return; hudTick = true; requestAnimationFrame(() => {
+  const mid = scrollY + innerHeight * .5; let cur = null, ci = -1;
+  secs.forEach((s, i) => { if (s.el.getBoundingClientRect().top + scrollY <= mid){ cur = s; ci = i; } });
+  let km = '0 km', name = '發射台';
+  if (cur){ name = cur.name; if (cur.km === 'ground') km = '地面站'; else { let v = parseFloat(cur.km); const nxt = secs[ci + 1]; if (nxt && nxt.km !== 'ground'){ const top = cur.el.getBoundingClientRect().top + scrollY, h = cur.el.offsetHeight, st = top + h * .7, p = Math.min(1, Math.max(0, (mid - st) / (h * .3))); if (p > 0){ v = v + (parseFloat(nxt.km) - v) * p; name = '轉移軌道'; } } km = fmt(v); } }
+  hudKm.textContent = km; hudName.textContent = name; hudTick = false; }); }
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+/* 導覽目前章 */
+const navLinks = document.querySelectorAll('.nav ul a');
+const nio = new IntersectionObserver((es) => { es.forEach((e) => { if (e.isIntersecting) navLinks.forEach(a => a.setAttribute('aria-current', a.getAttribute('href') === '#' + e.target.id ? 'true' : 'false')); }); }, { rootMargin: '-40% 0px -50% 0px' });
+navLinks.forEach(a => { const el = document.querySelector(a.getAttribute('href')); if (el) nio.observe(el); });
+
+/* 手機目錄 */
+const mb = document.querySelector('.menu-btn'), menu = document.getElementById('menu');
+function setMenu(o){ mb.setAttribute('aria-expanded', String(o)); menu.classList.toggle('open', o); menu.setAttribute('aria-hidden', String(!o)); if (lenis) o ? lenis.stop() : lenis.start(); }
+mb.addEventListener('click', () => setMenu(true)); menu.querySelector('.close').addEventListener('click', () => setMenu(false));
+menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+
+/* 游標與磁吸 */
+if (fine && !reduce){
+  document.body.classList.add('has-cursor');
+  const cur = document.getElementById('cursor'); const c = { x: innerWidth / 2, y: innerHeight / 2, tx: innerWidth / 2, ty: innerHeight / 2 };
+  addEventListener('mousemove', (e) => { c.tx = e.clientX; c.ty = e.clientY; }, { passive: true });
+  gsap.ticker.add(() => { c.x += (c.tx - c.x) * 0.18; c.y += (c.ty - c.y) * 0.18; cur.style.transform = `translate3d(${c.x}px,${c.y}px,0)`; });
+  document.querySelectorAll('a, button, summary').forEach(el => { el.addEventListener('mouseenter', () => cur.classList.add('on')); el.addEventListener('mouseleave', () => cur.classList.remove('on')); });
+  document.querySelectorAll('.magnet').forEach(b => { b.addEventListener('mousemove', (e) => { const r = b.getBoundingClientRect(); gsap.to(b, { x: (e.clientX - r.left - r.width / 2) * 0.22, y: (e.clientY - r.top - r.height / 2) * 0.22, duration: 0.5, ease: 'power3.out' }); }); b.addEventListener('mouseleave', () => gsap.to(b, { x: 0, y: 0, duration: 0.6, ease: 'power3.out' })); });
+}
+
+/* 載入與開場 */
+const pre = document.getElementById('preloader'), pct = document.getElementById('pct');
+let n = 0; const fake = setInterval(() => { n = Math.min(100, n + (n < 70 ? 7 : 3)); pct.textContent = n; if (n >= 100){ clearInterval(fake); setTimeout(intro, reduce ? 0 : 250); } }, reduce ? 1 : 38);
+function intro(){
+  pre.classList.add('done');
+  if (webgl && !reduce){ state.camZ.current = 5.2; state.camY.current = -0.4; state.lookY.current = 1.6; }
+  ScrollTrigger.refresh();
+  setTimeout(() => document.body.classList.add('intro-done'), reduce ? 0 : 200);
+}
 </script>
 </body>
 </html>
