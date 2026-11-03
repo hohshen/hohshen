@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant-TW" data-theme="dark">
+<html lang="zh-Hant-TW">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,723 +14,499 @@
 <meta property="og:image:height" content="1199">
 <meta name="twitter:card" content="summary_large_image">
 <meta property="og:locale" content="zh_TW">
-<!-- avoid-ai-design-ignore-file: K3, T2, SD6, SD5, SD2, C6 ；C6 hero 標題文字漸層是 landing-page-design skill B5 明文規則（深色主題 #FFFFFF→#9B9B9B）；SD2 黑底加火焰橘是本人要求「酷炫」後的刻意選擇（橘指回火箭尾焰），本人定案；K3 導覽列毛玻璃、T2 Geist 為 landing-page-design skill B7/B1 明文規則；SD6 章節編號是真實序列；SD5 是標題逐行升起動畫的 span 切行；B5 hero 標題 max-width 1100 是 96px 襯線兩行的物理需求，記在 PRD 偏離表 -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23000'/%3E%3Ccircle cx='16' cy='22' r='10' fill='none' stroke='%23FF5C1A' stroke-width='2'/%3E%3C/svg%3E">
+<!-- avoid-ai-design-ignore-file: T7 ；Noto Sans TC 由 Google Fonts 載入，PingFang TC 是系統回退 -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F7F7F5'/%3E%3Crect x='6' y='6' width='20' height='20' fill='none' stroke='%231F4E8C' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ============ tokens ============ */
 :root{
-  --sp-25:2px;--sp-50:4px;--sp-75:8px;--sp-100:12px;--sp-200:16px;--sp-300:24px;--sp-400:32px;--sp-500:40px;--sp-600:48px;--sp-700:64px;--sp-800:80px;--sp-900:96px;
-  --r-md:6px;--r-lg:8px;--r-xl:12px;--r-2xl:16px;--r-3xl:24px;--r-full:9999px;
-  --ease:cubic-bezier(0.22,1,0.36,1);
-  --bg:#000000;--surface:#181818;--surface-2:#1F1F1F;--surface-3:#272727;--ghost:#313131;
-  --text:#ffffff;--text-2:#cfcfcf;--muted:#9B9B9B;--border:#272727;
-  --accent:#FF5C1A;--accent-ink:#000000;
-  --nav-bg:rgba(0,0,0,.6);
-  --serif:"Noto Serif TC","Songti TC","PingFang TC",serif;
-  --sans:"Geist","Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
-  --mono:"Geist Mono","Noto Sans TC","PingFang TC",ui-monospace,monospace;
-  color-scheme:dark;
+  --sp-50:4px;--sp-75:8px;--sp-100:12px;--sp-200:16px;--sp-300:24px;--sp-400:32px;--sp-500:40px;--sp-600:48px;--sp-700:64px;--sp-800:80px;--sp-900:96px;
+  --paper:#F7F7F5;--ink:#24292F;--ink-2:#57606A;--rule:#D0D7DE;--accent:#1F4E8C;
+  color-scheme:light;
 }
-
-/* ============ base ============ */
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--bg)}
+html{scroll-behavior:smooth;background:var(--paper)}
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:24px;font-weight:400;-webkit-font-smoothing:antialiased;text-wrap:pretty;overflow-x:hidden}
-.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-.serif{font-family:var(--serif)}
-a{color:inherit;text-decoration:none}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r-md)}
-h1,h2,h3,h4,p{margin:0}
-h1,h2,h3,h4{text-wrap:balance}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC","PingFang TC",sans-serif;font-size:16px;line-height:26px;font-weight:400;-webkit-font-smoothing:antialiased;text-wrap:pretty}
+h1,h2,h3,p,figure,ul,ol{margin:0}
+h1,h2,h3{text-wrap:balance;font-weight:600}
+h1{font-size:48px;line-height:56px;max-width:680px}
+h2{font-size:30px;line-height:38px}
+h3{font-size:20px;line-height:28px;font-weight:500}
+a{color:var(--accent);text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:3px;transition:text-decoration-color .15s}
+a:hover{text-decoration-color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 img{display:block;max-width:100%;height:auto}
-.u{text-decoration:underline;text-decoration-color:var(--ghost);text-underline-offset:4px;transition:text-decoration-color .3s var(--ease),color .3s var(--ease)}
-.u:hover{color:var(--accent);text-decoration-color:var(--accent)}
-.acc{color:var(--accent)}
-.muted{color:var(--muted)}
-.t2{color:var(--text-2)}
-
-/* ============ type (Tailwind steps) ============ */
-.d-xl{font-family:var(--serif);font-size:128px;line-height:1;font-weight:700;letter-spacing:-0.02em}
-.d-lg{font-family:var(--serif);font-size:96px;line-height:1;font-weight:700;letter-spacing:-0.02em}
-.d-md{font-family:var(--serif);font-size:72px;line-height:1;font-weight:600;letter-spacing:-0.01em}
-.d-sm{font-family:var(--serif);font-size:60px;line-height:1;font-weight:600}
-.h-2{font-family:var(--serif);font-size:48px;line-height:1;font-weight:600}
-.h-3{font-family:var(--serif);font-size:36px;line-height:40px;font-weight:600}
-.h-4{font-family:var(--serif);font-size:30px;line-height:36px;font-weight:600}
-.h-5{font-family:var(--serif);font-size:24px;line-height:32px;font-weight:600}
-.t-1{font-size:20px;line-height:28px;font-weight:500}
-.t-2{font-size:18px;line-height:28px;font-weight:500}
-.t-3{font-size:16px;line-height:24px;font-weight:500}
-.b-3{font-size:16px;line-height:24px;font-weight:400}
-.b-6{font-size:14px;line-height:20px;font-weight:400}
-.c-1{font-size:14px;line-height:20px;font-weight:500}
-.c-2{font-size:14px;line-height:20px;font-weight:400}
-.c-3{font-size:12px;line-height:16px;font-weight:600}
-.c-4{font-size:12px;line-height:16px;font-weight:500}
-.btn-md{font-size:16px;line-height:24px;font-weight:600}
-.btn-sm{font-size:14px;line-height:20px;font-weight:600}
-.outline{color:transparent;-webkit-text-stroke:1px var(--accent);font-family:var(--mono);font-weight:500;letter-spacing:-0.04em}
-
-/* ============ layout ============ */
-.wrap{max-width:1320px;margin:0 auto;padding-left:var(--sp-400);padding-right:var(--sp-400)}
-.skip{position:absolute;left:var(--sp-200);top:-100px;background:var(--accent);color:var(--accent-ink);padding:var(--sp-75) var(--sp-100);border-radius:var(--r-lg);z-index:100}
+.small{font-size:14px;line-height:20px;color:var(--ink-2)}
+.num{font-variant-numeric:tabular-nums}
+.btn{display:inline-block;border:1px solid var(--ink);border-radius:2px;padding:var(--sp-75) var(--sp-100);color:var(--ink);text-decoration:none;font-weight:500;background:transparent;transition:background-color .15s,color .15s}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.skip{position:absolute;left:var(--sp-200);top:-100px;background:var(--ink);color:var(--paper);padding:var(--sp-75) var(--sp-100);z-index:100}
 .skip:focus{top:var(--sp-200)}
-.kicker{display:inline-flex;align-items:center;gap:var(--sp-100);color:var(--accent);font-family:var(--mono);white-space:nowrap}
-.kicker::before{content:"";width:32px;height:1px;background:var(--accent)}
 
-/* ============ nav ============ */
-.nav{position:fixed;top:var(--sp-200);left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:var(--sp-50);padding:var(--sp-75);background:var(--nav-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:var(--r-full);width:max-content;max-width:calc(100% - 32px);transition:transform .5s var(--ease),opacity .3s var(--ease)}
-.nav.hide{transform:translate(-50%,-140%);opacity:0}
-.nav-brand{padding:var(--sp-50) var(--sp-100);white-space:nowrap;display:inline-flex;align-items:center;gap:var(--sp-75)}
-.nav-brand i{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
-.nav-links{display:flex;gap:var(--sp-25)}
-.nav-links a{padding:var(--sp-50) var(--sp-100);border-radius:var(--r-full);color:var(--muted);transition:color .3s var(--ease),background-color .3s var(--ease)}
-.nav-links a:hover,.nav-links a[aria-current="true"]{color:var(--text);background:var(--surface)}
-.nav .btn{margin-left:var(--sp-50)}
-.nav-toggle{display:none;background:none;border:0;padding:var(--sp-75);cursor:pointer;color:var(--text);border-radius:var(--r-full)}
-.nav-toggle svg{display:block}
-.nav-toggle line{transition:transform .5s var(--ease),opacity .3s var(--ease);transform-origin:center}
-.nav-toggle[aria-expanded="true"] .l1{transform:translateY(5px) rotate(45deg)}
-.nav-toggle[aria-expanded="true"] .l2{opacity:0}
-.nav-toggle[aria-expanded="true"] .l3{transform:translateY(-5px) rotate(-45deg)}
-.menu{position:fixed;inset:0;z-index:40;background:var(--bg);opacity:.96;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:none;flex-direction:column;justify-content:center;padding:var(--sp-300)}
-.menu.open{display:flex}
-.menu a{display:block;padding:var(--sp-100) 0;opacity:0;transform:translateY(24px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
-.menu.open a{opacity:1;transform:none}
+/* 版面：第 1 欄留給高度尺，內文第 2 欄，寬表跨 2 到 3 欄 */
+.sheet{display:grid;grid-template-columns:96px minmax(0,760px) minmax(0,264px);max-width:1120px;margin-inline:auto;column-gap:var(--sp-500);padding-inline:var(--sp-300)}
+.sheet>*{grid-column:2}
+.sheet>.wide{grid-column:2/4}
+section{padding-block:var(--sp-800)}
+section+section{border-top:1px solid var(--rule)}
+.alt{display:flex;gap:var(--sp-200);font-size:14px;line-height:20px;color:var(--ink-2);padding-top:var(--sp-100);position:relative;margin-bottom:var(--sp-300)}
+.alt::before{content:"";position:absolute;left:0;top:0;width:48px;height:1px;background:var(--ink)}
+.alt .num{color:var(--ink)}
+.lead{color:var(--ink-2);margin-top:var(--sp-200);max-width:640px}
+.sec-head{margin-bottom:var(--sp-500)}
 
-/* ============ buttons ============ */
-.btn{display:inline-flex;align-items:center;gap:var(--sp-75);padding:var(--sp-75) var(--sp-100);border-radius:var(--r-full);border:1px solid transparent;background:var(--text);color:var(--bg);cursor:pointer;white-space:nowrap;transition:background-color .3s var(--ease),color .3s var(--ease),transform .3s var(--ease)}
-.btn:hover{background:var(--accent);color:var(--accent-ink)}
-.btn:active{transform:scale(.98)}
-.btn-acc{background:var(--accent);color:var(--accent-ink)}
-.btn-acc:hover{background:var(--text);color:var(--bg)}
-.btn-ghost{background:transparent;color:var(--text);border-color:var(--ghost)}
-.btn-ghost:hover{background:transparent;color:var(--accent);border-color:var(--accent)}
-.btn-lg{padding:var(--sp-100) var(--sp-300)}
-.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;pointer-events:none}
-.magnet{transition:transform .5s var(--ease),background-color .3s var(--ease),color .3s var(--ease)}
-/* B7 例外：跟隨指標的 80ms linear 是磁吸的必要寫法，否則按鈕會落後游標 */
-.magnet.active{transition:transform .08s linear,background-color .3s var(--ease),color .3s var(--ease)}
+/* 導覽 */
+.nav{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule)}
+.nav .in{max-width:1120px;margin-inline:auto;padding-inline:var(--sp-300);height:48px;display:flex;align-items:center;gap:var(--sp-400)}
+.nav .brand{color:var(--ink);text-decoration:none;font-weight:500}
+.nav ul{list-style:none;display:flex;gap:var(--sp-300);margin:0;padding:0;flex:1}
+.nav ul a{color:var(--ink);text-decoration:none;display:inline-block;line-height:48px}
+.nav ul a[aria-current="true"]{color:var(--accent);box-shadow:inset 0 -2px var(--accent)}
+.nav .cta{text-decoration:none}
+.nav button{display:none;background:none;border:0;padding:0;font:inherit;color:var(--ink);cursor:pointer;margin-left:auto}
+#menu{display:none;position:absolute;left:0;right:0;top:48px;background:var(--paper);border-bottom:1px solid var(--rule)}
+#menu.open{display:block}
+#menu a{display:block;height:48px;line-height:48px;padding-inline:var(--sp-300);border-top:1px solid var(--rule);color:var(--ink);text-decoration:none}
+#menu a.acc{color:var(--accent)}
 
-/* ============ planet scene ============ */
-.scene{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.scene svg{width:100%;height:100%;display:block}
-.scene .star{fill:#fff;opacity:.5}
-.scene .star.tw{animation:tw 6s var(--ease) infinite alternate}
-@keyframes tw{from{opacity:.15}to{opacity:.8}}
-.scene .planet{fill:#181818;stroke:var(--accent);stroke-width:2}
-.scene .limb{fill:none;stroke:var(--accent);stroke-opacity:.35;stroke-width:28}
-.scene .ring{fill:none;stroke:#fff;stroke-opacity:.18;stroke-width:1;stroke-dasharray:3 9}
-.scene .ring2{fill:none;stroke:#fff;stroke-opacity:.1;stroke-width:1}
-.scene .orbit{transform-box:fill-box;transform-origin:center;animation:spin 60s linear infinite}
-.scene .orbit2{transform-box:fill-box;transform-origin:center;animation:spin 150s linear infinite reverse}
-/* B7 例外：等速旋轉物理上只能 linear */
-@keyframes spin{to{transform:rotate(360deg)}}
-.scene .ship{fill:var(--accent)}
-.scene .ship2{fill:#fff}
-.karman{position:absolute;left:0;right:0;top:13%;z-index:0;pointer-events:none;border-top:1px dashed rgba(255,92,26,.45)}
-.karman span{position:absolute;left:var(--sp-400);top:6px;font-family:var(--mono);font-size:12px;line-height:16px;color:var(--muted)}
-.scene #planetG,.scene #starsG{will-change:transform}
+/* hero */
+.hero{display:grid;grid-template-columns:7fr 5fr;gap:var(--sp-500);align-items:start}
+.hero .head{display:flex;gap:var(--sp-300);flex-wrap:wrap;margin-bottom:var(--sp-400)}
+.hero .sub{font-size:18px;line-height:28px;margin-top:var(--sp-300);max-width:640px}
+.hero .act{display:flex;gap:var(--sp-300);align-items:center;margin-top:var(--sp-400);flex-wrap:wrap}
+figure{position:relative}
+figure img{width:100%;aspect-ratio:3/2;object-fit:cover}
+figcaption{margin-top:var(--sp-100);font-size:14px;line-height:20px;color:var(--ink-2)}
+.stamp{position:absolute;right:12px;top:-18px;width:148px;height:48px;transform:rotate(-6deg)}
+.stamp svg{width:100%;height:100%;overflow:visible}
 
-/* ============ hero ============ */
-.hero{position:relative;height:100vh;min-height:720px;display:flex;flex-direction:column;justify-content:center;padding-top:var(--sp-700);padding-bottom:var(--sp-900);overflow:hidden}
-.hero .wrap{position:relative;z-index:1;width:100%}
-.hero .eyebrow{color:var(--muted);margin-bottom:var(--sp-400);display:flex;gap:var(--sp-300);flex-wrap:wrap}
-.hero h1{max-width:1100px}
-.hero h1 .line{display:inline-block;background:linear-gradient(90deg,#FFFFFF 0%,#9B9B9B 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero .sub{max-width:620px;margin-top:var(--sp-500);color:var(--text-2)}
-.hero .cta{display:flex;gap:var(--sp-100);align-items:center;margin-top:var(--sp-500);flex-wrap:wrap}
-.hero-foot{position:absolute;left:0;right:0;bottom:var(--sp-400);z-index:1;color:var(--muted)}
-.hero-foot .wrap{display:flex;justify-content:space-between;gap:var(--sp-300);flex-wrap:wrap}
-.hero-foot .chev{display:inline-block;animation:chev 1.6s var(--ease) 1.6s 2}
-@keyframes chev{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(6px);opacity:1}}
+/* 標語 */
+.manifest{font-size:20px;line-height:32px;padding-left:var(--sp-500)}
 
-/* launch */
-.hero .eyebrow,.hero .sub,.hero .cta,.hero-foot{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
-.hero h1 .line{opacity:0;transform:translateY(48px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
-#planetG{transform:translateY(240px);transition:transform 2.2s var(--ease)}
-.launched #planetG{transform:translateY(0)}
-.launched .hero .eyebrow,.launched .hero .sub,.launched .hero .cta,.launched .hero-foot,.launched .hero h1 .line{opacity:1;transform:none}
-.launched .hero .eyebrow{transition-delay:.1s}
-.launched .hero h1 .line:nth-child(1){transition-delay:.3s}
-.launched .hero h1 .line:nth-child(3){transition-delay:.45s}
-.launched .hero .sub{transition-delay:.7s}
-.launched .hero .cta{transition-delay:.85s}
-.launched .hero-foot{transition-delay:1.2s}
+/* 表 */
+table{width:100%;border-collapse:collapse}
+th{font-size:14px;line-height:20px;color:var(--ink-2);font-weight:500;text-align:left;padding:var(--sp-100) var(--sp-200) var(--sp-100) 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+td{padding:var(--sp-200) var(--sp-200) var(--sp-200) 0;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:1px solid var(--ink)}
+.rec td:first-child{width:160px;font-size:36px;line-height:40px;font-weight:600;white-space:nowrap}
+.rec td:first-child small{font-size:16px;line-height:24px;font-weight:400;margin-left:var(--sp-50)}
+.rec td:nth-child(2){width:38%}
+.rec td:nth-child(3){font-size:14px;line-height:20px;color:var(--ink-2)}
+.rec .first{color:var(--accent)}
+.dec td:first-child{font-weight:500;width:22%}
+.talk td:first-child{width:72px}
+.talk td:nth-child(3){color:var(--ink-2)}
 
+/* 機制圖 */
+.mech svg{width:100%;height:auto;display:block}
+.mech .g{opacity:0;transition:opacity .4s}
+.mech.in .g{opacity:1}
+.mech.in .g2{transition-delay:.25s}.mech.in .g3{transition-delay:.5s}.mech.in .g4{transition-delay:.75s}.mech.in .g5{transition-delay:1s}
+.steps{padding-left:var(--sp-300);margin-top:var(--sp-500);display:grid;gap:var(--sp-200)}
+.steps li::marker{color:var(--ink-2)}
+.steps b{font-weight:500}
 
-/* ============ manifest ============ */
-.manifest{padding:var(--sp-900) 0}
-.manifest p{max-width:1200px}
-.manifest .w{display:inline;color:var(--text);opacity:.25;transition:opacity .5s var(--ease)}
-.manifest .w.on{opacity:1}
+/* 寫作線 */
+.lines{list-style:none;padding:0;border-top:1px solid var(--ink)}
+.lines li{display:grid;grid-template-columns:1fr auto;gap:var(--sp-400);padding-block:var(--sp-300);border-bottom:1px solid var(--rule);align-items:start}
+.lines li:last-child{border-bottom:1px solid var(--ink)}
+.lines p{margin-top:var(--sp-50)}
+.lines .take{font-size:14px;line-height:20px;color:var(--ink-2);margin-top:var(--sp-75)}
+.lines .st{font-size:14px;line-height:20px;color:var(--ink-2);white-space:nowrap;padding-top:var(--sp-50)}
+.lines .st a{white-space:nowrap}
 
-/* ============ numbers ============ */
-.numbers{padding:var(--sp-800) 0}
-.nrow{display:grid;grid-template-columns:5fr 4fr 3fr;gap:var(--sp-500);align-items:end;padding:var(--sp-500) 0;border-top:1px solid var(--border)}
-.nrow:last-child{border-bottom:1px solid var(--border)}
-.nrow .n{font-family:var(--mono);font-size:128px;line-height:1;font-weight:500;letter-spacing:-0.05em;color:var(--accent)}
-.nrow .n small{font-size:36px;line-height:40px;color:var(--text);margin-left:var(--sp-100);letter-spacing:0}
-.nrow .l{font-family:var(--serif);font-size:30px;line-height:36px;font-weight:600}
-.nrow .s{color:var(--muted);align-self:end}
-.src{display:flex;align-items:center;gap:var(--sp-75);color:var(--text-2);margin-bottom:var(--sp-100);font-family:var(--mono)}
-.src i{width:8px;height:8px;border-radius:50%;flex:none;background:var(--ghost)}
-.src i.media{background:transparent;border:1px solid var(--accent)}
-.src i.pub{background:var(--accent)}
-.src .ch{display:inline-block;opacity:0;transform:translateY(10px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
-.in .src .ch{opacity:1;transform:none}
+/* 演講圖版 */
+.plates{display:grid;grid-template-columns:7fr 5fr;gap:var(--sp-300);margin-bottom:var(--sp-500)}
+.plates .col{display:grid;gap:var(--sp-300)}
+.plates .tall img{aspect-ratio:auto;height:100%;object-position:50% 35%}
 
-/* ============ film ============ */
-.film{position:relative;overflow:hidden;height:100vh;min-height:560px}
-.film img{position:absolute;left:0;top:-10%;width:100%;height:120%;object-fit:cover;object-position:center 40%;will-change:transform}
-.film .shade{position:absolute;inset:0;background:#000;opacity:.55}
-.film .inner{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:var(--sp-800)}
-.film .q{max-width:1000px;color:#fff}
-.film .meta{margin-top:var(--sp-400);display:flex;gap:var(--sp-400);flex-wrap:wrap;color:#cfcfcf}
-.strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-200);padding:var(--sp-200) var(--sp-400);background:var(--bg)}
-.ph{position:relative;border-radius:var(--r-xl);overflow:hidden;background:var(--surface);display:block}
-.ph img{aspect-ratio:698/390;object-fit:cover;width:100%;transition:transform .6s var(--ease)}
-.ph:hover img{transform:scale(1.05)}
-.ph .cap{position:absolute;left:0;right:0;bottom:0;padding:var(--sp-100) var(--sp-200);display:flex;justify-content:space-between;gap:var(--sp-100);color:#fff;background:rgba(0,0,0,.6)}
-.ph .cap .mono{color:var(--accent)}
-.ph::after{content:"";position:absolute;inset:0;background:var(--bg);transform:scaleX(1);transform-origin:right center;transition:transform .9s var(--ease);pointer-events:none}
-.in .ph::after{transform:scaleX(0)}
-.in .ph:nth-child(2)::after{transition-delay:.12s}.in .ph:nth-child(3)::after{transition-delay:.24s}
-
-/* ============ chapters ============ */
-.chapter{padding:var(--sp-900) 0;border-top:1px solid var(--border)}
-.ch-head{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-700);align-items:end;margin-bottom:var(--sp-800)}
-.ch-head .no{display:block;font-size:128px;line-height:1;margin-bottom:var(--sp-300)}
-.ch-head h2{margin-top:var(--sp-200)}
-.ch-head .lead{color:var(--text-2);max-width:520px;font-size:20px;line-height:28px;font-weight:400;font-family:var(--serif)}
-
-/* karman crossing event：#decisions 進場時橘色虛線從左畫到右，只播一次 */
-#decisions{position:relative}
-#decisions::before{content:"";position:absolute;left:0;right:0;top:-1px;border-top:1px dashed var(--accent);transform:scaleX(0);transform-origin:left center;transition:transform .9s var(--ease) .2s}
-#decisions.crossed::before{transform:scaleX(1)}
-.rail .line b.flash{animation:flash .4s var(--ease) 2}
-@keyframes flash{50%{opacity:.2;transform:translateY(-50%) scale(1.8)}}
-
-/* dossier */
-.dossier{display:grid;grid-template-columns:96px 1fr;gap:var(--sp-500);padding:var(--sp-700) 0;border-top:1px solid var(--border);transition:transform .5s var(--ease),opacity .6s var(--ease)}
-.dossier:last-child{border-bottom:1px solid var(--border)}
-.dossier .i{font-family:var(--mono);font-size:24px;line-height:32px;color:var(--muted);padding-top:var(--sp-50)}
-.dossier .cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-500);margin-top:var(--sp-500)}
-.dossier .cols span{display:block;color:var(--accent);margin-bottom:var(--sp-100);font-family:var(--mono)}
-.dossier .cols p{color:var(--text-2)}
-
-/* orbit lines (writing) */
-.orow{display:grid;grid-template-columns:96px 1fr auto;gap:var(--sp-500);padding:var(--sp-600) 0;border-top:1px solid var(--border);align-items:center;transition:transform .5s var(--ease),opacity .6s var(--ease)}
-.orow:last-child{border-bottom:1px solid var(--border)}
-.orow .i{font-family:var(--mono);font-size:24px;line-height:32px;color:var(--muted);transition:color .4s var(--ease)}
-.orow:hover .i{color:var(--accent)}
-.orow .k{color:var(--muted);margin-bottom:var(--sp-100)}
-.orow p{color:var(--text-2);margin-top:var(--sp-100);max-width:640px}
-.pill{display:inline-flex;align-items:center;gap:var(--sp-75);padding:var(--sp-50) var(--sp-100);border:1px solid var(--ghost);border-radius:var(--r-full);color:var(--muted);white-space:nowrap;font-family:var(--mono)}
-.pill.on{color:var(--accent);border-color:var(--accent)}
-
-/* orbit map（寫作線星圖）：捲到哪一列，環轉到哪顆點 */
-.wgrid{display:grid;grid-template-columns:1fr 240px;gap:0 var(--sp-700);align-items:start}
-.wgrid .ch-head,.wgrid .olist{grid-column:1}
-.wgrid .omap{grid-column:2;grid-row:1/3}
-.omap{position:sticky;top:120px;width:240px;height:240px}
-.omap svg{width:100%;height:100%;display:block;overflow:visible}
-.omap .ring{fill:none;stroke:#fff;stroke-opacity:.18;stroke-dasharray:3 9}
-.omap .core{fill:var(--surface);stroke:var(--accent);stroke-width:2}
-.omap .rot{transform-box:fill-box;transform-origin:center;transition:transform .6s var(--ease)}
-.omap .pt{fill:#fff;fill-opacity:.3;transition:fill .3s var(--ease),fill-opacity .3s var(--ease)}
-.omap .pt.on{fill:var(--accent);fill-opacity:1}
-.omap .cap{position:absolute;left:0;right:0;top:100%;margin-top:var(--sp-200);text-align:center;color:var(--muted)}
-.omap .cap b{display:block;color:var(--text);font-weight:500}
-
-/* steps */
-.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-500)}
-.step{background:var(--surface);border-radius:var(--r-2xl);padding:var(--sp-400);transition:transform .6s var(--ease),opacity .6s var(--ease)}
-.step .no{display:block;font-size:72px;line-height:1;margin-bottom:var(--sp-400)}
-.step p{color:var(--text-2);margin-top:var(--sp-100)}
-
-/* talks */
-.trow{display:grid;grid-template-columns:200px 1fr 1fr auto;gap:var(--sp-500);padding:var(--sp-500) 0;border-top:1px solid var(--border);align-items:baseline;transition:transform .5s var(--ease),opacity .6s var(--ease)}
-.trow:last-child{border-bottom:1px solid var(--border)}
-.trow .y{font-family:var(--mono);font-size:60px;line-height:1;font-weight:500;letter-spacing:-0.04em;color:var(--accent)}
-.trow .v{color:var(--muted)}
-
-/* ground station */
-.ground{display:grid;grid-template-columns:5fr 7fr;gap:var(--sp-800);align-items:start}
-.bio{display:grid;grid-template-columns:200px 1fr;gap:var(--sp-400);align-items:start}
-.bio img{border-radius:var(--r-2xl);aspect-ratio:516/766;object-fit:cover;width:100%}
-.faq details{border-top:1px solid var(--border)}
-.faq details:last-child{border-bottom:1px solid var(--border)}
-.faq summary{list-style:none;cursor:pointer;padding:var(--sp-300) 0;display:flex;justify-content:space-between;gap:var(--sp-200);align-items:center;font-family:var(--serif);font-size:24px;line-height:32px;font-weight:600}
+/* 關於 */
+.about{display:grid;grid-template-columns:7fr 5fr;gap:var(--sp-500)}
+.bio{display:grid;grid-template-columns:160px 1fr;gap:var(--sp-300);align-items:start}
+.bio figure img{aspect-ratio:2/3}
+.bio p+p{margin-top:var(--sp-200)}
+.faq details{border-bottom:1px solid var(--rule)}
+.faq details:first-child{border-top:1px solid var(--ink)}
+.faq summary{list-style:none;cursor:pointer;padding-block:var(--sp-200);font-weight:500;display:flex;justify-content:space-between;gap:var(--sp-200)}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary svg{flex:none;color:var(--accent);transition:transform .5s var(--ease)}
-.faq details[open] summary svg{transform:rotate(45deg)}
-.faq .a{padding:0 0 var(--sp-300);color:var(--text-2);max-width:600px;opacity:0;transform:translateY(-8px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
-.faq details[open] .a{opacity:1;transform:none}
+.faq summary::after{content:"+";color:var(--ink-2)}
+.faq details[open] summary::after{content:"−"}
+.faq .a{padding-bottom:var(--sp-200);color:var(--ink)}
 
-/* docking */
-.dock{position:relative;overflow:hidden;min-height:100vh;display:flex;align-items:center;border-top:1px solid var(--border)}
-.dock .wrap{position:relative;z-index:1;width:100%}
-#planetG2{transform:translateY(-240px);transition:transform 2.2s var(--ease)}
-.dock.in #planetG2{transform:none}
-.dock h2{max-width:1100px}
-.dock .row2{display:flex;justify-content:space-between;align-items:flex-end;gap:var(--sp-500);margin-top:var(--sp-700);flex-wrap:wrap}
-.dock p{color:var(--text-2);max-width:520px}
+/* 對接 */
+.dock{border-top:2px solid var(--ink);padding-top:var(--sp-500)}
+.dock p{margin-top:var(--sp-200);max-width:560px}
+.dock .btn{margin-top:var(--sp-300)}
 
-/* footer */
-footer{padding:var(--sp-800) 0 var(--sp-600);color:var(--muted);position:relative;z-index:1;background:var(--bg)}
-.wordmark{font-size:128px;line-height:1;white-space:nowrap;overflow:hidden}
-.foot{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-500);margin-top:var(--sp-700)}
-.foot table{width:100%;border-collapse:collapse}
-.foot td{padding:var(--sp-75) var(--sp-100) var(--sp-75) 0;border-bottom:1px solid var(--border);vertical-align:top}
-.foot .links{display:flex;flex-direction:column;gap:var(--sp-100);align-items:flex-start}
+/* 頁尾 */
+footer{border-top:1px solid var(--rule);padding-block:var(--sp-600)}
+.foot{display:grid;grid-template-columns:8fr 4fr;gap:var(--sp-500);font-size:14px;line-height:20px;color:var(--ink-2)}
+.foot td{padding:var(--sp-75) var(--sp-200) var(--sp-75) 0;font-size:14px;line-height:20px}
+.foot td:first-child,.foot td:nth-child(2){white-space:nowrap}
+.foot .who{display:grid;gap:var(--sp-75);align-content:start}
+.foot .who b{color:var(--ink);font-weight:500}
 
-/* rail */
-.rail{position:fixed;right:var(--sp-400);top:50%;transform:translateY(-50%);height:240px;z-index:30;display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-300);color:var(--muted)}
-.rail .line{position:relative;width:1px;height:100%;background:var(--border)}
-.rail .line i{position:absolute;right:-3px;width:7px;height:1px;background:var(--border)}
-.rail .line i::after{content:attr(data-n);position:absolute;right:14px;top:-8px;white-space:nowrap;color:var(--muted);font-size:12px;line-height:16px;transition:color .3s var(--ease)}
-.rail .line i.passed::after{color:var(--text)}
-.rail .line b{position:absolute;right:-4px;top:0;width:9px;height:9px;border-radius:var(--r-full);background:var(--accent);transform:translateY(-50%);transition:transform .5s var(--ease)}
-.rail .lbl{text-align:right;white-space:nowrap;padding:var(--sp-50) var(--sp-75);border-radius:var(--r-lg);transition:background-color .3s var(--ease)}
-.rail.on-photo .lbl{background:rgba(0,0,0,.6)}
-.rail .lbl span{display:block;color:var(--text)}
+/* 高度尺 */
+.scale{position:fixed;left:24px;top:50%;transform:translateY(-50%);width:64px;z-index:10}
+.scale svg{width:64px;height:520px;display:block;overflow:visible}
+.scale #ptr{transition:transform .2s linear}
+.scale .now{font-size:14px;line-height:20px;margin-top:var(--sp-100);color:var(--ink-2);white-space:nowrap}
+.scale .now b{display:block;color:var(--ink);font-weight:500}
+@media (prefers-reduced-motion: reduce){.mech .g{opacity:1;transition:none}.scale #ptr{transition:none}}
 
-/* reveals */
-.rv{opacity:0;transform:translateY(32px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
-.rv.in{opacity:1;transform:none}
-.ch-head h2 .ch{display:inline-block;opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
-.in .ch-head h2 .ch{opacity:1;transform:none}
-.nrow,.dossier,.orow,.trow,.step{opacity:0;transform:translateY(24px)}
-.in .nrow,.in .dossier,.in .orow,.in .trow,.in .step{opacity:1;transform:none}
-.in .orow:hover,.in .trow:hover,.in .dossier:hover{transform:translateX(12px)}
-
-@media (prefers-reduced-motion: reduce){
-  .hero .eyebrow,.hero .sub,.hero .cta,.hero-foot,.hero h1 .line,.ch-head h2 .ch,.nrow,.dossier,.orow,.trow,.step,.rv,.faq .a{transform:none !important;transition:opacity .4s var(--ease) !important}
-  #planetG,#planetG2{transform:none !important;transition:none}
-  #decisions::before{transform:none;transition:none}
-  .rail .line b.flash{animation:none}
-  .omap .rot{transition:none}
-  .ph::after{display:none}
-  .scene .star.tw,.scene .orbit,.scene .orbit2,.hero-foot .chev{animation:none}
-  .manifest .w{opacity:1;transition:none}
-  .magnet{transform:none !important}
+@media (max-width:1240px){.scale{display:none}}
+@media (max-width:960px){
+  .sheet{grid-template-columns:1fr}
+  .sheet>*,.sheet>.wide{grid-column:1}
+  .hero,.about,.plates,.foot{grid-template-columns:1fr}
+  .plates .tall img{aspect-ratio:3/2;height:auto}
 }
-
-/* responsive */
-@media (max-width: 1100px){
-  .d-lg{font-size:72px}.d-xl,.ch-head .no,.wordmark{font-size:96px}
-  .nrow .n{font-size:96px}
-  }
-@media (max-width: 960px){
-  .ch-head,.ground,.foot{grid-template-columns:1fr}
-  .nrow{grid-template-columns:1fr;gap:var(--sp-200);align-items:start}
-  .dossier{grid-template-columns:1fr;gap:var(--sp-300)}
-  .dossier .cols{grid-template-columns:1fr;gap:var(--sp-300)}
-  .orow{grid-template-columns:96px 1fr}.orow .pill{grid-column:2;justify-self:start}
-  .trow{grid-template-columns:1fr}.trow .y{font-size:48px}
-  .steps{grid-template-columns:1fr}
-  .bio{grid-template-columns:140px 1fr}
-  .rail{display:none}
-  .wgrid{grid-template-columns:1fr}
-  .wgrid .omap{grid-column:1;grid-row:auto;order:1;position:relative;top:auto;width:160px;height:160px;margin:0 0 var(--sp-900)}
-  .wgrid .olist{order:2}
-}
-@media (max-width: 720px){
-  .nav-links,.nav .btn{display:none}
-  .nav-toggle{display:block}
-  .nav{left:var(--sp-200);right:var(--sp-200);transform:none;width:auto;max-width:none;justify-content:space-between}
-  .nav.hide{transform:translateY(-140%)}
-  .wrap{padding-left:var(--sp-200);padding-right:var(--sp-200)}
-  .hero{height:auto;min-height:100vh;padding-top:var(--sp-900);padding-bottom:120px;justify-content:flex-start}
-  .d-lg{font-size:48px;line-height:1}
-  .hero h1 br{display:none}
-  .hero h1 .line{display:inline;transform:none}
-  .d-md{font-size:36px;line-height:40px}
-  .d-xl,.ch-head .no,.wordmark{font-size:60px}
-  .h-2{font-size:36px;line-height:40px}
-  .h-4{font-size:24px;line-height:32px}
-  .h-3{font-size:30px;line-height:36px}
-  .nrow .n{font-size:60px}.nrow .n small{font-size:20px;line-height:28px}
-  .nrow .l{font-size:24px;line-height:32px}
-  .manifest p{font-size:30px;line-height:36px}
-  .film{height:70vh}.film .q{font-size:36px;line-height:40px}
-  .strip{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:var(--sp-100);padding:var(--sp-100) var(--sp-200)}
-  .strip .ph{flex:0 0 300px;scroll-snap-align:start}
-  .chapter,.numbers,.manifest{padding:var(--sp-700) 0}
-  .step .no{font-size:48px}
-  .orow{grid-template-columns:64px 1fr;gap:var(--sp-300)}
-  .faq summary{font-size:20px;line-height:28px}
-  .bio{grid-template-columns:1fr}.bio img{max-width:200px}
-  .dock h2{font-size:36px;line-height:40px}
-  .karman{display:none}
-  .scene .orbit,.scene .orbit2{display:none}
+@media (max-width:720px){
+  section{padding-block:var(--sp-600)}
+  h1{font-size:30px;line-height:38px}
+  h2{font-size:24px;line-height:32px}
+  .nav ul,.nav .cta{display:none}
+  .nav button{display:block}
+  .manifest{font-size:18px;line-height:28px;padding-left:var(--sp-300)}
+  .rec td:first-child{font-size:30px;line-height:36px;width:auto}
+  .rec tr,.dec tr{display:block;padding-block:var(--sp-200);border-bottom:1px solid var(--rule)}
+  .rec td,.dec td,.rec td:first-child,.dec td:first-child,.rec td:nth-child(2){display:block;padding:var(--sp-50) 0;border:0;width:auto}
+  .rec thead,.dec thead{display:none}
+  .dec td::before{content:attr(data-label);display:block;font-size:14px;line-height:20px;color:var(--ink-2)}
+  .rec tr:last-child,.dec tr:last-child{border-bottom:1px solid var(--ink)}
+  .rec tbody,.dec tbody{display:block;border-top:1px solid var(--ink)}
+  .rec tr:last-child td,.dec tr:last-child td{border-bottom:0}
+  .lines li{grid-template-columns:1fr}
+  .bio{grid-template-columns:120px 1fr}
+  .stamp{transform:rotate(-6deg) scale(.75);transform-origin:top right;right:4px;top:-12px}
 }
 </style>
 </head>
 <body>
-<a class="skip c-1" href="#main">跳到內容</a>
+<a class="skip" href="#main">跳到內容</a>
 
 <nav class="nav" aria-label="主導覽">
-  <a class="nav-brand c-1" href="#top"><i></i>後端里長伯</a>
-  <div class="nav-links c-1">
+  <div class="in">
+    <a class="brand" href="#top">後端里長伯</a>
+    <ul>
+      <li><a href="#writing">寫作</a></li>
+      <li><a href="#talks">演講</a></li>
+      <li><a href="#decisions">取捨</a></li>
+      <li><a href="#about">關於</a></li>
+    </ul>
+    <a class="cta" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請合作</a>
+    <button type="button" aria-expanded="false" aria-controls="menu">目錄</button>
+  </div>
+  <div id="menu">
     <a href="#writing">寫作</a>
     <a href="#talks">演講</a>
     <a href="#decisions">取捨</a>
     <a href="#about">關於</a>
+    <a class="acc" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請合作</a>
   </div>
-  <a class="btn btn-sm" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請合作</a>
-  <button class="nav-toggle" aria-expanded="false" aria-controls="menu" aria-label="開關選單">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line class="l1" x1="3" y1="5" x2="17" y2="5"/><line class="l2" x1="3" y1="10" x2="17" y2="10"/><line class="l3" x1="3" y1="15" x2="17" y2="15"/></svg>
-  </button>
 </nav>
-<div class="menu" id="menu" aria-hidden="true">
-  <a class="h-4" href="#writing" style="transition-delay:0ms">寫作</a>
-  <a class="h-4" href="#talks" style="transition-delay:60ms">演講</a>
-  <a class="h-4" href="#decisions" style="transition-delay:120ms">取捨</a>
-  <a class="h-4" href="#about" style="transition-delay:180ms">關於</a>
-  <a class="h-4 acc" href="mailto:hohshen@gmail.com?subject=邀請演講或合作" style="transition-delay:240ms">邀請合作</a>
-</div>
 
-<aside class="rail c-4 mono" aria-hidden="true">
-  <div class="line"><i style="top:0" data-n="0 km"></i><i style="top:25%" data-n="50"></i><i style="top:50%" data-n="100"></i><i style="top:75%" data-n="400"></i><i style="bottom:0" data-n="36,000"></i><b id="railDot"></b></div>
-  <div class="lbl"><span id="railAlt">0 km</span>發射台</div>
+<aside class="scale" aria-hidden="true">
+  <svg id="scaleSvg" viewBox="0 0 64 520"></svg>
+  <p class="now num"><b id="nowKm">0 km</b><span id="nowName">發射台</span></p>
 </aside>
 
-<main id="main">
-<!-- ============ HERO: planet ============ -->
-<section class="hero" id="top">
-  <div class="scene" aria-hidden="true">
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
-      <g id="starsG"></g>
-      <g id="planetG">
-        <g class="orbit2"><circle class="ring2" cx="720" cy="1560" r="1180"/><circle class="ship2" cx="720" cy="380" r="3"/></g>
-        <g class="orbit"><circle class="ring" cx="720" cy="1560" r="1040"/><circle class="ship" cx="720" cy="520" r="6"/><circle class="ship" cx="720" cy="520" r="11" fill="none" stroke="#FF5C1A" stroke-opacity=".35"/><circle class="ship" cx="720" cy="2600" r="6"/><circle class="ship" cx="720" cy="2600" r="11" fill="none" stroke="#FF5C1A" stroke-opacity=".35"/></g>
-        <circle class="limb" cx="720" cy="1560" r="906"/>
-        <circle class="planet" cx="720" cy="1560" r="900"/>
-      </g>
-    </svg>
-  </div>
-  <div class="karman" aria-hidden="true"><span>100 km ・ 卡門線</span></div>
-  <div class="wrap">
-    <p class="eyebrow mono c-1"><span class="kicker">Hohshen ・ 後端里長伯</span><span>企業架構師</span><span id="clock">T-3</span></p>
-    <h1 class="d-lg"><span class="line">把架構取捨，</span><br><span class="line">寫成別人也驗得出來的制度。</span></h1>
-    <p class="sub t-2">我是後端里長伯 Hohshen，製造業的企業架構師。白天把核心系統從總部接到工廠、把 AI 從概念驗證送進全公司日常營運的軌道；晚上把這些取捨寫成文章與演講。這一頁上的每個數字，旁邊都有出處。</p>
-    <div class="cta">
-      <a class="btn btn-acc btn-lg btn-md magnet" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請我演講或合作</a>
-      <a class="btn btn-ghost btn-lg btn-md magnet" href="#writing">看四條寫作線</a>
+<main id="main" class="sheet">
+
+<!-- hero -->
+<section class="wide" id="top" style="border-top:0">
+  <div class="hero">
+    <div class="text">
+      <p class="head small"><span>後端里長伯 Hohshen</span><span>企業架構師</span><span>COSCUP 連續三年講者</span></p>
+      <h1>把架構取捨，寫成別人也驗得出來的制度。</h1>
+      <p class="sub">我是後端里長伯 Hohshen，製造業的企業架構師。白天把核心系統從總部接到工廠、把 AI 從概念驗證送進全公司日常營運的軌道；晚上把這些取捨寫成文章與演講。這一頁上的每個數字，旁邊都有出處。</p>
+      <p class="act"><a class="btn" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請我演講或合作</a><a href="#writing">看四條寫作線</a></p>
     </div>
-  </div>
-  <div class="hero-foot c-2 mono">
-    <div class="wrap"><span>0 km ・ 發射台 ・ COSCUP 連續三年講者 ・ 12 場技術演講</span><span>往下捲，離開地面 <span class="chev">↓</span></span></div>
+    <figure>
+      <img src="img/film-mopcon.jpg" alt="後端里長伯在 MOPCON 2025 舞台上拿麥克風演講，背景投影片是後端里長伯的 Instagram 與 Medium" width="1800" height="1199">
+      <figcaption>圖 1　MOPCON 2025，台上。台上講的東西，都是公司裡先跑過一輪的。</figcaption>
+      <div class="stamp" aria-hidden="true"><svg id="stampSvg" viewBox="0 0 148 48"></svg></div>
+    </figure>
   </div>
 </section>
 
-<!-- ============ MANIFEST ============ -->
-<section class="manifest rv">
-  <div class="wrap"><p class="d-md" data-reveal-words>我擅長的 不是追工具， 是做取捨。 自建或採購， 哪些判斷 交給機器， 哪些留給人。 這些取捨 最後都要寫成 別人也驗得出來 的東西， 不然 只是我的品味。</p></div>
+<!-- 標語 -->
+<section>
+  <p class="manifest">我擅長的不是追工具，是做取捨。自建或採購，哪些判斷交給機器，哪些留給人。這些取捨最後都要寫成別人也驗得出來的東西，不然只是我的品味。</p>
 </section>
 
-<!-- ============ NUMBERS ============ -->
-<section class="numbers rv" id="record">
-  <div class="wrap">
-    <div class="ch-head">
-      <div><span class="kicker sec-no c-1">0 km ・ 發射台</span><h2 class="h-2" style="margin-top:var(--sp-300)">實戰紀錄，附出處</h2></div>
-      <p class="lead">我寫的每一篇、講的每一場，素材都從這裡起飛。數字只抄不算；出處兩態：媒體報導附公開連結、內部資料面談可說明。</p>
-    </div>
-    <div class="nrow"><span class="n"><span data-count="99">0</span><small>%</small></span><span class="l">同仁每月都在用的 AI 數位員工</span><span class="s c-2"><span class="src c-4"><i class="int"></i><span data-src>SRC ・ 內部資料 ・ 面談可說明</span></span>人均每月委派約 6 件任務；依營運、法務、技術分三個角色。內部資料，面談可說明</span></div>
-    <div class="nrow"><span class="n"><span data-count="19">0</span><small>個模組</small></span><span class="l">企業入口平台，總部簽核到工廠生產循環</span><span class="s c-2"><span class="src c-4"><i class="int"></i><span data-src>SRC ・ 內部資料 ・ 面談可說明</span></span>多數核心系統由我設計並完成；起步 3 人 5 個月交付 5 套，原估 1 年。內部資料</span></div>
-    <div class="nrow"><span class="n"><span data-count="10">0</span><small>萬盞</small></span><span class="l">智慧路燈平台支撐的設備數</span><span class="s c-2"><span class="src c-4"><i class="media"></i><span data-src>SRC ・ 媒體報導 ・ 自由時報 2021</span></span><a class="u" href="https://news.ltn.com.tw/news/life/breakingnews/3686912" target="_blank" rel="noopener">專案整體年省約 1.53 億電費，自由時報報導</a></span></div>
-    <div class="nrow"><span class="n"><span data-count="121">0</span><small>%</small></span><span class="l">QA 數位員工讓測試情境成長的幅度</span><span class="s c-2"><span class="src c-4"><i class="int"></i><span data-src>SRC ・ 內部資料 ・ 面談可說明</span></span>跨 6 個系統 12 階段；受控文件模組檢查全數通過，較期限提前四週。內部資料</span></div>
-    <div class="nrow"><span class="n"><span data-count="1">0</span><small>/10</small></span><span class="l">常規審查成本降到的比例</span><span class="s c-2"><span class="src c-4"><i class="int"></i><span data-src>SRC ・ 內部資料 ・ 面談可說明</span></span>統計 22 次設計流程的 AI 花費後，改為自動檢查先過濾，判不了的才開多模型審查。內部資料</span></div>
-    <div class="nrow"><span class="n"><span data-count="5">0</span><small>種協定</small></span><span class="l">特權存取管理平台，單一介面管理多雲資產</span><span class="s c-2"><span class="src c-4"><i class="media"></i><span data-src>SRC ・ 媒體報導 ・ TechOrange 2023</span></span><a class="u" href="https://techorange.com/2023/03/17/cloudmile-pentium-network-mavis/" target="_blank" rel="noopener">SSH、RDP、SFTP、PostgreSQL、Web Sandbox，TechOrange 報導</a></span></div>
+<!-- 0 km 紀錄表 -->
+<section class="wide" id="record">
+  <div class="sec-head">
+    <p class="alt" data-km="0" data-name="發射台"><span class="num">0 km</span><span>發射台</span></p>
+    <h2>實戰紀錄，附出處</h2>
+    <p class="lead">我寫的每一篇、講的每一場，素材都從這裡起飛。數字只抄不算；出處兩態：媒體報導附公開連結、內部資料面談可說明。</p>
   </div>
+  <table class="rec">
+    <thead><tr><th>數字</th><th>事項</th><th>出處</th></tr></thead>
+    <tbody>
+      <tr><td class="num first">99<small>%</small></td><td>同仁每月都在用的 AI 數位員工</td><td>人均每月委派約 6 件任務；依營運、法務、技術分三個角色。內部資料，面談可說明</td></tr>
+      <tr><td class="num">19<small>個模組</small></td><td>企業入口平台，總部簽核到工廠生產循環</td><td>多數核心系統由我設計並完成；起步 3 人 5 個月交付 5 套，原估 1 年。內部資料</td></tr>
+      <tr><td class="num">10<small>萬盞</small></td><td>智慧路燈平台支撐的設備數</td><td><a href="https://news.ltn.com.tw/news/life/breakingnews/3686912" target="_blank" rel="noopener">專案整體年省約 1.53 億電費，自由時報報導</a></td></tr>
+      <tr><td class="num">121<small>%</small></td><td>QA 數位員工讓測試情境成長的幅度</td><td>跨 6 個系統 12 階段；受控文件模組檢查全數通過，較期限提前四週。內部資料</td></tr>
+      <tr><td class="num">1/10</td><td>常規審查成本降到的比例</td><td>統計 22 次設計流程的 AI 花費後，改為自動檢查先過濾，判不了的才開多模型審查。內部資料</td></tr>
+      <tr><td class="num">5<small>種協定</small></td><td>特權存取管理平台，單一介面管理多雲資產</td><td><a href="https://techorange.com/2023/03/17/cloudmile-pentium-network-mavis/" target="_blank" rel="noopener">SSH、RDP、SFTP、PostgreSQL、Web Sandbox，TechOrange 報導</a></td></tr>
+    </tbody>
+  </table>
 </section>
 
-<!-- ============ FILM ============ -->
-<section class="film" id="film">
-  <img id="filmImg" src="img/film-mopcon.jpg" alt="後端里長伯在 MOPCON 2025 舞台上拿麥克風演講，背景投影片是後端里長伯的 Instagram 與 Medium" width="1800" height="1199">
-  <div class="shade"></div>
-  <div class="wrap inner">
-    <span class="kicker c-1">MOPCON 2025</span>
-    <p class="q d-md" style="margin-top:var(--sp-300)">台上講的東西，都是公司裡先跑過一輪的。</p>
-    <div class="meta c-1 mono"><span>打造會記憶的 AI Codebase 理解引擎 ・ 付費講師</span><a class="u" href="https://coscup.org/2025/sessions/CAD9S3" target="_blank" rel="noopener">同題 COSCUP 議程</a></div>
+<!-- 50 km 機制圖 -->
+<section id="how">
+  <div class="sec-head">
+    <p class="alt" data-km="50" data-name="平流層頂"><span class="num">50 km</span><span>平流層頂</span></p>
+    <h2>每一篇怎麼來的</h2>
+    <p class="lead">沒上線過的不講。三步，缺一步就不發。</p>
   </div>
+  <figure class="mech" id="mech">
+    <svg id="mechSvg" viewBox="0 0 760 320" role="img" aria-label="機制圖：概念驗證從地面升空，進入全公司日常營運的軌道反覆運行，再向外廣播成文章與演講"></svg>
+    <figcaption>圖 2　從地面送進軌道，再廣播出去。每一篇、每一場都走這條路。</figcaption>
+  </figure>
+  <ol class="steps">
+    <li><b>公司裡先跑一輪。</b>題目一定先在真的系統上做過：核心系統、AI 數位員工、QA 自動化。</li>
+    <li><b>寫成取捨紀錄。</b>每個決定填四欄：為什麼、為什麼不、撤銷條件、出處。填不出撤銷條件的，代表還沒想清楚。</li>
+    <li><b>上台或發文，附出處。</b>只用驗得出來的數字。有公開連結就連，沒有就標內部資料，面談可追問。</li>
+  </ol>
 </section>
-<div class="strip rv">
-  <a class="ph" href="#talks"><img src="img/talk-coscup24.jpg" alt="後端里長伯在 COSCUP 2024 講台上，背景投影片是探索 PG Vector" width="1200" height="802"><div class="cap c-1"><span>COSCUP，PG Vector 與 RAG</span><span class="mono">2024</span></div></a>
-  <a class="ph" href="#talks"><img src="img/talk-coscup26.jpg" alt="後端里長伯在 COSCUP 2026 與 UbuCon Asia 的主視覺牆前" width="1200" height="800"><div class="cap c-1"><span>COSCUP，連續第三年</span><span class="mono">2026</span></div></a>
-  <a class="ph" href="#talks"><img src="img/talk-devfest.jpg" alt="後端里長伯在 DevFest 2024 的 Google Developer Groups 背板前" width="698" height="390"><div class="cap c-1"><span>DevFest，GDG</span><span class="mono">2024</span></div></a>
-</div>
 
-<!-- ============ HOW ============ -->
-<section class="chapter rv">
-  <div class="wrap">
-    <div class="ch-head">
-      <div><span class="outline no">01</span><span class="kicker sec-no c-1">50 km ・ 平流層頂</span><h2 class="h-2">每一篇怎麼來的</h2></div>
-      <p class="lead">沒上線過的不講。三步，缺一步就不發。</p>
-    </div>
-    <div class="steps">
-      <div class="step"><span class="no mono muted c-1" style="font-size:24px;line-height:32px;font-weight:500">1</span><span class="h-4">公司裡先跑一輪</span><p class="b-6">題目一定先在真的系統上做過：核心系統、AI 數位員工、QA 自動化。</p></div>
-      <div class="step"><span class="no mono muted c-1" style="font-size:24px;line-height:32px;font-weight:500">2</span><span class="h-4">寫成取捨紀錄</span><p class="b-6">每個決定填四欄：為什麼、為什麼不、撤銷條件、出處。填不出撤銷條件的，代表還沒想清楚。</p></div>
-      <div class="step"><span class="no mono muted c-1" style="font-size:24px;line-height:32px;font-weight:500">3</span><span class="h-4">上台或發文，附出處</span><p class="b-6">只用驗得出來的數字。有公開連結就連，沒有就標內部資料，面談可追問。</p></div>
+<!-- 100 km 取捨表 -->
+<section class="wide" id="decisions">
+  <div class="sec-head">
+    <p class="alt" data-km="100" data-name="卡門線"><span class="num">100 km</span><span>卡門線</span></p>
+    <h2>取捨紀錄</h2>
+    <p class="lead">卡門線是大氣層與太空的分界。AI 專案能不能離開概念驗證，差別不在技術，在這幾個取捨有沒有寫成制度。這也是我每篇文章的骨架。</p>
+  </div>
+  <table class="dec">
+    <thead><tr><th scope="col">決定</th><th scope="col">為什麼</th><th scope="col">為什麼不選另一邊</th><th scope="col">撤銷條件</th></tr></thead>
+    <tbody>
+      <tr><td data-label="決定">AI 核心採購，流程與驗收自建</td><td data-label="為什麼">AI 迭代速度過快，自建核心追不上大廠。</td><td data-label="為什麼不選另一邊">自建核心會把人力耗在追版本，而公司的差異在任務流程與驗收規則。</td><td data-label="撤銷條件">採購產品無法承載公司的驗收規則，或成本結構反轉。</td></tr>
+      <tr><td data-label="決定">自動檢查先過濾，多模型審查殿後</td><td data-label="為什麼">22 次流程統計，近半花費在讓多個 AI 互相審查。</td><td data-label="為什麼不選另一邊">全靠多模型審查品質好但貴；全靠規則會漏掉需要語意判斷的題目。</td><td data-label="撤銷條件">自動檢查的漏判率高到下游修復成本超過省下的審查費。</td></tr>
+      <tr><td data-label="決定">測試情境是唯一規格來源</td><td data-label="為什麼">E2E 測試從情境自動產生，失敗先分系統缺陷或測試錯誤。</td><td data-label="為什麼不選另一邊">手寫測試會與規格漂移，兩份正本永遠對不上。</td><td data-label="撤銷條件">情境描述無法表達的驗證需求佔比上升。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 400 km 寫作線 -->
+<section id="writing">
+  <div class="sec-head">
+    <p class="alt" data-km="400" data-name="低地軌道"><span class="num">400 km</span><span>低地軌道</span></p>
+    <h2>四條寫作線</h2>
+    <p class="lead">入軌之後就是持續運行。每條線各回答一個問題，你拿到的是方法與帳本，不是結論。篇數與狀態如實標示。</p>
+  </div>
+  <ul class="lines">
+    <li><div><h3>架構是成本</h3><p>每個架構決定都算維運、認知與換掉它的代價。先算帳再選，不先選再找理由。</p><p class="take">你會帶走：一張架構的帳</p></div><span class="st">6 篇，撰寫中</span></li>
+    <li><div><h3>規格的品味</h3><p>「做到什麼算完成」怎麼寫到 PM、工程師與 AI 看同一份。附我在公司裡用的交付閘門。</p><p class="take">你會帶走：一份驗得出來的規格</p></div><span class="st">4 篇，撰寫中</span></li>
+    <li><div><h3>建立 AI 開發團隊</h3><p>自建或採購、哪些判斷交給機器、哪些留給人。全公司 99% 同仁每月在用的體系怎麼長出來的。</p><p class="take">你會帶走：一套 AI 落地的取捨</p></div><span class="st">系列，撰寫中</span></li>
+    <li><div><h3>搜尋演進史</h3><p>倒排索引到向量、GraphRAG、SAG。每一代解決了什麼、又把什麼留給下一代，用 PostgreSQL 實作。</p><p class="take">你會帶走：一條搜尋技術的演進線</p></div><span class="st">10 篇，撰寫中</span></li>
+    <li><div><h3>CRUD 仔的一生</h3><p>30 篇。ACID、鎖、MVCC、WAL、查詢優化、索引結構、資料分割與讀寫分離。</p><p class="take">已公開：iThome 鐵人賽 2023</p></div><span class="st"><a href="https://ithelp.ithome.com.tw/users/20163269/ironman/6881" target="_blank" rel="noopener">閱讀 30 篇</a></span></li>
+  </ul>
+</section>
+
+<!-- 36,000 km 演講 -->
+<section class="wide" id="talks">
+  <div class="sec-head">
+    <p class="alt" data-km="36000" data-name="同步軌道"><span class="num">36,000 km</span><span>同步軌道</span></p>
+    <h2>演講</h2>
+    <p class="lead">同步軌道上的衛星負責廣播。公司裡驗證過的做法，透過演講往外送；2024 至 2026 共 12 場，COSCUP 連續三年，JSDC 與 MOPCON 付費講師。</p>
+  </div>
+  <div class="plates">
+    <figure class="tall"><img src="img/talk-coscup24.jpg" alt="後端里長伯在 COSCUP 2024 講台上，背景投影片是探索 PG Vector" width="1200" height="802"><figcaption>圖 3　COSCUP 2024，講台上。投影片是探索 PG Vector。</figcaption></figure>
+    <div class="col">
+      <figure><img src="img/talk-coscup26.jpg" alt="後端里長伯在 COSCUP 2026 與 UbuCon Asia 的主視覺牆前" width="1200" height="800"><figcaption>圖 4　COSCUP 2026 與 UbuCon Asia 主視覺牆前，連續第三年。</figcaption></figure>
+      <figure><img src="img/talk-devfest.jpg" alt="後端里長伯在 DevFest 2024 的 Google Developer Groups 背板前" width="698" height="390"><figcaption>圖 5　DevFest 2024，GDG 背板前。</figcaption></figure>
     </div>
   </div>
+  <table class="talk">
+    <thead><tr><th>年</th><th>題目</th><th>場次</th><th>連結</th></tr></thead>
+    <tbody>
+      <tr><td class="num">2026</td><td>以 PostgreSQL 驅動 SAG 動態超邊推論引擎</td><td>COSCUP</td><td><a href="https://coscup.org/2026/session/NHBKPE" target="_blank" rel="noopener">議程</a></td></tr>
+      <tr><td class="num">2025</td><td>打造會記憶的 AI Codebase 理解引擎</td><td>COSCUP、TAIDE、MOPCON、JSDC 巡迴四場</td><td><a href="https://coscup.org/2025/sessions/CAD9S3" target="_blank" rel="noopener">議程</a></td></tr>
+      <tr><td class="num">2025</td><td>MCP 與 A2A 協定</td><td>Postgres Taiwan 小講堂</td><td><a href="https://www.youtube.com/watch?v=NeUdvqI0gnY" target="_blank" rel="noopener">錄影</a></td></tr>
+      <tr><td class="num">2024</td><td>PG Vector 與多模態檢索</td><td>COSCUP、GDG Taipei、DevFest 高雄與台中、JSDC 巡迴五場</td><td><a href="https://www.youtube.com/watch?v=jT-A18wTBHM" target="_blank" rel="noopener">錄影</a></td></tr>
+    </tbody>
+  </table>
 </section>
 
-<!-- ============ DECISIONS ============ -->
-<section class="chapter rv" id="decisions">
-  <div class="wrap">
-    <div class="ch-head">
-      <div><span class="outline no">02</span><span class="kicker sec-no c-1">100 km ・ 卡門線</span><h2 class="h-2">取捨紀錄</h2></div>
-      <p class="lead">卡門線是大氣層與太空的分界。AI 專案能不能離開概念驗證，差別不在技術，在這幾個取捨有沒有寫成制度。這也是我每篇文章的骨架。</p>
-    </div>
-    <article class="dossier">
-      <span class="i">01</span>
-      <div><h3 class="h-3">AI 核心採購，流程與驗收自建</h3>
-        <div class="cols b-6"><div><span class="c-1">為什麼</span><p>AI 迭代速度過快，自建核心追不上大廠。</p></div><div><span class="c-1">為什麼不選另一邊</span><p>自建核心會把人力耗在追版本，而公司的差異在任務流程與驗收規則。</p></div><div><span class="c-1">撤銷條件</span><p>採購產品無法承載公司的驗收規則，或成本結構反轉。</p></div></div></div>
-    </article>
-    <article class="dossier">
-      <span class="i">02</span>
-      <div><h3 class="h-3">自動檢查先過濾，多模型審查殿後</h3>
-        <div class="cols b-6"><div><span class="c-1">為什麼</span><p>22 次流程統計，近半花費在讓多個 AI 互相審查。</p></div><div><span class="c-1">為什麼不選另一邊</span><p>全靠多模型審查品質好但貴；全靠規則會漏掉需要語意判斷的題目。</p></div><div><span class="c-1">撤銷條件</span><p>自動檢查的漏判率高到下游修復成本超過省下的審查費。</p></div></div></div>
-    </article>
-    <article class="dossier">
-      <span class="i">03</span>
-      <div><h3 class="h-3">測試情境是唯一規格來源</h3>
-        <div class="cols b-6"><div><span class="c-1">為什麼</span><p>E2E 測試從情境自動產生，失敗先分系統缺陷或測試錯誤。</p></div><div><span class="c-1">為什麼不選另一邊</span><p>手寫測試會與規格漂移，兩份正本永遠對不上。</p></div><div><span class="c-1">撤銷條件</span><p>情境描述無法表達的驗證需求佔比上升。</p></div></div></div>
-    </article>
+<!-- 地面站 關於 -->
+<section class="wide" id="about">
+  <div class="sec-head">
+    <p class="alt" data-km="ground" data-name="通訊"><span>地面站</span><span>通訊</span></p>
+    <h2>關於我</h2>
+    <p class="lead">何勝，網路上叫後端里長伯。製造業的企業架構師，負責企業系統與 AI 導入的架構決策與交付制度。</p>
   </div>
-</section>
-
-<!-- ============ WRITING ============ -->
-<section class="chapter rv" id="writing">
-  <div class="wrap wgrid">
-    <div class="ch-head">
-      <div><span class="outline no">03</span><span class="kicker sec-no c-1">400 km ・ 低地軌道</span><h2 class="h-2">四條寫作線</h2></div>
-      <p class="lead">入軌之後就是持續運行。每條線各回答一個問題，你拿到的是方法與帳本，不是結論。篇數與狀態如實標示。</p>
-    </div>
-   <div class="olist">
-    <div class="orow"><span class="i">01</span><div><span class="k c-1 mono">你會帶走：一張架構的帳</span><h3 class="h-3">架構是成本</h3><p class="b-3">每個架構決定都算維運、認知與換掉它的代價。先算帳再選，不先選再找理由。</p></div><span class="pill c-1">6 篇 ・ 撰寫中</span></div>
-    <div class="orow"><span class="i">02</span><div><span class="k c-1 mono">你會帶走：一份驗得出來的規格</span><h3 class="h-3">規格的品味</h3><p class="b-3">「做到什麼算完成」怎麼寫到 PM、工程師與 AI 看同一份。附我在公司裡用的交付閘門。</p></div><span class="pill c-1">4 篇 ・ 撰寫中</span></div>
-    <div class="orow"><span class="i">03</span><div><span class="k c-1 mono">你會帶走：一套 AI 落地的取捨</span><h3 class="h-3">建立 AI 開發團隊</h3><p class="b-3">自建或採購、哪些判斷交給機器、哪些留給人。全公司 99% 同仁每月在用的體系怎麼長出來的。</p></div><span class="pill c-1">系列 ・ 撰寫中</span></div>
-    <div class="orow"><span class="i">04</span><div><span class="k c-1 mono">你會帶走：一條搜尋技術的演進線</span><h3 class="h-3">搜尋演進史</h3><p class="b-3">倒排索引到向量、GraphRAG、SAG。每一代解決了什麼、又把什麼留給下一代，用 PostgreSQL 實作。</p></div><span class="pill c-1">10 篇 ・ 撰寫中</span></div>
-    <a class="orow" href="https://ithelp.ithome.com.tw/users/20163269/ironman/6881" target="_blank" rel="noopener"><span class="i">05</span><div><span class="k c-1 mono">已公開：iThome 鐵人賽 2023</span><h3 class="h-3">CRUD 仔的一生</h3><p class="b-3">30 篇。ACID、鎖、MVCC、WAL、查詢優化、索引結構、資料分割與讀寫分離。</p></div><span class="pill on c-1">閱讀 30 篇</span></a>
-   </div>
-   <div class="omap" aria-hidden="true">
-    <svg viewBox="0 0 240 240">
-      <circle class="ring" cx="120" cy="120" r="96"/>
-      <g class="rot" id="omapRot">
-        <circle class="pt" data-i="0" cx="120" cy="24" r="6"/>
-        <circle class="pt" data-i="1" cx="211.3" cy="90.3" r="6"/>
-        <circle class="pt" data-i="2" cx="176.4" cy="197.7" r="6"/>
-        <circle class="pt" data-i="3" cx="63.6" cy="197.7" r="6"/>
-        <circle class="pt" data-i="4" cx="28.7" cy="90.3" r="6"/>
-      </g>
-      <circle class="core" cx="120" cy="120" r="22"/>
-    </svg>
-    <div class="cap c-4 mono"><b id="omapName">架構是成本</b><span id="omapNo">01 / 05</span></div>
-   </div>
-  </div>
-</section>
-
-<!-- ============ TALKS ============ -->
-<section class="chapter rv" id="talks">
-  <div class="wrap">
-    <div class="ch-head">
-      <div><span class="outline no">04</span><span class="kicker sec-no c-1">36,000 km ・ 同步軌道</span><h2 class="h-2">演講</h2></div>
-      <p class="lead">同步軌道上的衛星負責廣播。公司裡驗證過的做法，透過演講往外送；2024 至 2026 共 12 場，COSCUP 連續三年，JSDC 與 MOPCON 付費講師。</p>
-    </div>
-    <div class="trow"><span class="y">2026</span><span class="h-4">以 PostgreSQL 驅動 SAG 動態超邊推論引擎</span><span class="v b-6">COSCUP</span><a class="pill c-1" href="https://coscup.org/2026/session/NHBKPE" target="_blank" rel="noopener">議程</a></div>
-    <div class="trow"><span class="y">2025</span><span class="h-4">打造會記憶的 AI Codebase 理解引擎</span><span class="v b-6">COSCUP、TAIDE、MOPCON、JSDC 巡迴四場</span><a class="pill c-1" href="https://coscup.org/2025/sessions/CAD9S3" target="_blank" rel="noopener">議程</a></div>
-    <div class="trow"><span class="y">2025</span><span class="h-4">MCP 與 A2A 協定</span><span class="v b-6">Postgres Taiwan 小講堂</span><a class="pill c-1" href="https://www.youtube.com/watch?v=NeUdvqI0gnY" target="_blank" rel="noopener">錄影</a></div>
-    <div class="trow"><span class="y">2024</span><span class="h-4">PG Vector 與多模態檢索</span><span class="v b-6">COSCUP、GDG Taipei、DevFest 高雄與台中、JSDC 巡迴五場</span><a class="pill c-1" href="https://www.youtube.com/watch?v=jT-A18wTBHM" target="_blank" rel="noopener">錄影</a></div>
-  </div>
-</section>
-
-<!-- ============ GROUND STATION ============ -->
-<section class="chapter rv" id="about">
-  <div class="wrap">
-    <div class="ch-head">
-      <div><span class="outline no">05</span><span class="kicker sec-no c-1">地面站 ・ 通訊</span><h2 class="h-2">關於我</h2></div>
-      <p class="lead">何勝，網路上叫後端里長伯。製造業的企業架構師，負責企業系統與 AI 導入的架構決策與交付制度。</p>
-    </div>
-    <div class="ground">
-      <div class="bio">
-        <img src="img/portrait.jpg" alt="後端里長伯的大頭照" width="516" height="766">
-        <div>
-          <p class="t-1">之前做過資安產品的特權存取管理平台，更早在系統整合公司帶 5 至 8 人團隊，設計過支撐近 10 萬盞設備的智慧路燈平台。</p>
-          <p class="b-6 t2" style="margin-top:var(--sp-300)">三個產業共通的是高併發資料與跨部門交付。主力是 TypeScript、PostgreSQL、Kubernetes 與 LLM 周邊。國立臺北大學資訊工程學系。</p>
-        </div>
-      </div>
-      <div class="faq">
-        <details><summary>找你演講，可以講什麼？<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 2v12M2 8h12"/></svg></summary><p class="a b-3">PostgreSQL 與 AI 檢索（pgvector、GraphRAG、SAG）、AI 開發團隊怎麼建、規格與架構的取捨。每一場的素材都是公司裡先跑過一輪的。</p></details>
-        <details><summary>用什麼語言講？<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 2v12M2 8h12"/></svg></summary><p class="a b-3">中文。投影片中英混排。</p></details>
-        <details><summary>文章什麼時候公開？<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 2v12M2 8h12"/></svg></summary><p class="a b-3">鐵人賽 30 篇已公開。四條線的稿件已定稿，公開後連結會補在寫作區。</p></details>
-        <details><summary>「內部資料」的數字怎麼驗？<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 2v12M2 8h12"/></svg></summary><p class="a b-3">聊的時候我會說明量法與分母：模組怎麼數、覆蓋率怎麼算、測試情境成長的起訖點。可以追問到任何一個數字的來源。</p></details>
-        <details><summary>怎麼聯絡？<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 2v12M2 8h12"/></svg></summary><p class="a b-3">寄信到 hohshen@gmail.com，標題寫邀請演講或合作，內文一句話說明場合與題目方向即可。</p></details>
+  <div class="about">
+    <div class="bio">
+      <figure><img src="img/portrait.jpg" alt="後端里長伯的大頭照" width="516" height="766"><figcaption>圖 6　大頭照。</figcaption></figure>
+      <div>
+        <p>之前做過資安產品的特權存取管理平台，更早在系統整合公司帶 5 至 8 人團隊，設計過支撐近 10 萬盞設備的智慧路燈平台。</p>
+        <p class="small">三個產業共通的是高併發資料與跨部門交付。主力是 TypeScript、PostgreSQL、Kubernetes 與 LLM 周邊。國立臺北大學資訊工程學系。</p>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- ============ DOCKING ============ -->
-<section class="dock rv" id="dock">
-  <div class="scene" aria-hidden="true">
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMin slice">
-      <g id="starsG2"></g>
-      <g id="planetG2"><circle class="limb" cx="720" cy="-700" r="906"/><circle class="planet" cx="720" cy="-700" r="900"/><g class="orbit"><circle class="ring" cx="720" cy="-700" r="1040"/><circle class="ship" cx="720" cy="340" r="6"/></g></g>
-    </svg>
-  </div>
-  <div class="wrap">
-    <span class="kicker c-1">對接</span>
-    <h2 class="d-lg" style="margin-top:var(--sp-400)">有一場演講、一個題目，想一起把它寫成制度？</h2>
-    <div class="row2">
-      <p class="t-2">寄信時寫一句場合與題目方向就好。我會在兩個工作日內回覆。</p>
-      <a class="btn btn-acc btn-lg btn-md magnet" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請我演講或合作</a>
+    <div class="faq">
+      <details><summary>找你演講，可以講什麼？</summary><p class="a">PostgreSQL 與 AI 檢索（pgvector、GraphRAG、SAG）、AI 開發團隊怎麼建、規格與架構的取捨。每一場的素材都是公司裡先跑過一輪的。</p></details>
+      <details><summary>用什麼語言講？</summary><p class="a">中文。投影片中英混排。</p></details>
+      <details><summary>文章什麼時候公開？</summary><p class="a">鐵人賽 30 篇已公開。四條線的稿件已定稿，公開後連結會補在寫作區。</p></details>
+      <details><summary>「內部資料」的數字怎麼驗？</summary><p class="a">聊的時候我會說明量法與分母：模組怎麼數、覆蓋率怎麼算、測試情境成長的起訖點。可以追問到任何一個數字的來源。</p></details>
+      <details><summary>怎麼聯絡？</summary><p class="a">寄信到 hohshen@gmail.com，標題寫邀請演講或合作，內文一句話說明場合與題目方向即可。</p></details>
     </div>
   </div>
 </section>
+
+<!-- 對接 -->
+<section id="dock">
+  <div class="dock">
+    <h2>有一場演講、一個題目，想一起把它寫成制度？</h2>
+    <p>寄信時寫一句場合與題目方向就好。我會在兩個工作日內回覆。</p>
+    <a class="btn" href="mailto:hohshen@gmail.com?subject=邀請演講或合作">邀請我演講或合作</a>
+  </div>
+</section>
+
 </main>
 
 <footer>
-  <div class="wrap">
-    <div class="wordmark outline" aria-hidden="true">後端里長伯</div>
-    <div class="foot c-2">
+  <div class="sheet">
+    <div class="wide foot">
       <div>
-        <span class="c-1">修訂紀錄</span>
-        <table style="margin-top:var(--sp-100)">
-          <tr><td class="mono">2026-11-03</td><td class="mono">Rev.7</td><td>第二輪獨立審查後修正：高度計章內定高、章尾爬升標轉移軌道；卡門線虛線與圓點同拍；手機星圖移到標題下；高度計過照片帶加底；發射時鐘離開 hero 即停；og 絕對網址；出處改兩態</td></tr>
-          <tr><td class="mono">2026-11-03</td><td class="mono">Rev.6.1</td><td>網路上只用後端里長伯與何勝，站上真名全部移除</td></tr>
-          <tr><td class="mono">2026-11-02</td><td class="mono">Rev.6</td><td>獨立審查後修正：高度計連續遙測、卡門線穿越事件、寫作線星圖、出處遙測行；hero 收進首屏、照片換原檔、結尾行星升起；拿掉跑馬燈與項目描邊號；補社群連結、移除未定案問答</td></tr>
-          <tr><td class="mono">2026-11-02</td><td class="mono">Rev.5</td><td>整套視覺語言重做：火焰橘強調色、中文襯線大標、整顆行星與旋轉軌道環、128px 滿幅數字列、描邊章節號、卷宗式取捨與寫作線、證件照退到關於區</td></tr>
-          <tr><td class="mono">2026-11-02</td><td class="mono">Rev.4</td><td>編輯型版面：便當格、章節側欄、全幅照片帶</td></tr>
-          <tr><td class="mono">2026-11-02</td><td class="mono">Rev.3</td><td>動效與互動 17 項</td></tr>
-          <tr><td class="mono">2026-11-02</td><td class="mono">Rev.2</td><td>定位改為個人品牌；主題改為 AI 衝出大氣層</td></tr>
-          <tr><td class="mono">2026-11-02</td><td class="mono">Rev.1</td><td>prototype 首版，事實正本為履歷 2026-09-29 版</td></tr>
+        <table>
+          <thead><tr><th>日期</th><th>版本</th><th>修訂</th></tr></thead>
+          <tbody>
+            <tr><td class="num">2026-11-03</td><td>Rev.8</td><td>視覺語言第三版：受控工程文件。淺色紙底、單一藍墨強調色、Noto Sans TC 單家族、表格與圖版、手繪高度尺與機制圖；拿掉星空、行星、軌道、毛玻璃、文字漸層、逐段淡入與數字跑動</td></tr>
+            <tr><td class="num">2026-11-03</td><td>Rev.7</td><td>第二輪獨立審查後修正：高度計章內定高、卡門線事件同拍、手機星圖移到標題下、og 絕對網址、出處兩態</td></tr>
+            <tr><td class="num">2026-11-03</td><td>Rev.6.1</td><td>網路上只用後端里長伯與何勝，站上真名全部移除</td></tr>
+            <tr><td class="num">2026-11-02</td><td>Rev.6</td><td>第一輪獨立審查後修正；補社群連結、移除未定案問答</td></tr>
+            <tr><td class="num">2026-11-02</td><td>Rev.5</td><td>視覺語言第二版：火焰橘、襯線大標、行星與軌道環</td></tr>
+            <tr><td class="num">2026-11-02</td><td>Rev.2</td><td>定位改為個人品牌；主題改為 AI 衝出大氣層</td></tr>
+            <tr><td class="num">2026-11-02</td><td>Rev.1</td><td>prototype 首版，事實正本為履歷 2026-09-29 版</td></tr>
+          </tbody>
         </table>
       </div>
-      <div class="links">
-        <span>後端里長伯 Hohshen ・ 何勝</span>
-        <a class="u" href="mailto:hohshen@gmail.com">hohshen@gmail.com</a>
-        <a class="u" href="https://www.linkedin.com/in/hohshen" target="_blank" rel="noopener">LinkedIn</a>
-        <a class="u" href="https://www.instagram.com/hohshen.backend/" target="_blank" rel="noopener">Instagram hohshen.backend</a>
-        <a class="u" href="https://medium.com/@hohshencode" target="_blank" rel="noopener">Medium</a>
-        <a class="u" href="https://github.com/hohshen" target="_blank" rel="noopener">GitHub</a>
-        <span style="margin-top:var(--sp-200)">本站為靜態頁面，不使用 cookie，不蒐集任何資料。</span>
+      <div class="who">
+        <b>後端里長伯 Hohshen（何勝）</b>
+        <a href="mailto:hohshen@gmail.com">hohshen@gmail.com</a>
+        <a href="https://www.linkedin.com/in/hohshen" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.instagram.com/hohshen.backend/" target="_blank" rel="noopener">Instagram hohshen.backend</a>
+        <a href="https://medium.com/@hohshencode" target="_blank" rel="noopener">Medium</a>
+        <a href="https://github.com/hohshen" target="_blank" rel="noopener">GitHub</a>
+        <span>本站為靜態頁面，不使用 cookie，不蒐集任何資料。</span>
       </div>
     </div>
   </div>
 </footer>
 
+<script src="rough.js"></script>
 <script>
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var fine = window.matchMedia('(pointer: fine)').matches && window.innerWidth > 960;
+  var css = getComputedStyle(document.documentElement), V = function(n){ return css.getPropertyValue(n).trim(); };
+  var INK = V('--ink'), INK2 = V('--ink-2'), ACC = V('--accent'), PAPER = V('--paper');
+  var NS = 'http://www.w3.org/2000/svg';
+  function txt(svg, x, y, t, sz, color, weight, anchor){ var e = document.createElementNS(NS, 'text'); e.setAttribute('x', x); e.setAttribute('y', y); e.setAttribute('font-size', sz); e.setAttribute('fill', color || INK); if (weight) e.setAttribute('font-weight', weight); if (anchor) e.setAttribute('text-anchor', anchor); e.setAttribute('font-family', '"Noto Sans TC","PingFang TC",sans-serif'); e.textContent = t; svg.appendChild(e); return e; }
 
-  var tg = document.querySelector('.nav-toggle'), menu = document.getElementById('menu');
-  function setMenu(open){ tg.setAttribute('aria-expanded', String(open)); menu.classList.toggle('open', open); menu.setAttribute('aria-hidden', String(!open)); document.body.style.overflow = open ? 'hidden' : ''; }
+  /* 手機選單 */
+  var tg = document.querySelector('.nav button'), menu = document.getElementById('menu');
+  function setMenu(open){ tg.setAttribute('aria-expanded', String(open)); menu.classList.toggle('open', open); }
   tg.addEventListener('click', function(){ setMenu(tg.getAttribute('aria-expanded') !== 'true'); });
   menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ setMenu(false); }); });
 
-  var clock = document.getElementById('clock'), t0 = Date.now() + (reduce ? 0 : 1200);
-  function pad(n){ return (n < 10 ? '0' : '') + n; }
-  function tick(){ var d = Math.floor((Date.now() - t0) / 1000); clock.textContent = d < 0 ? 'T-' + (-d) : 'T+' + pad(Math.floor(d / 60)) + ':' + pad(d % 60); }
-  var clockTimer = null; if (clock){ tick(); clockTimer = setInterval(tick, 400); }
-  setTimeout(function(){ document.documentElement.classList.add('launched'); }, reduce ? 0 : 150);
+  /* 受控章 */
+  var st = document.getElementById('stampSvg');
+  if (st && window.rough){ var rs = rough.svg(st);
+    st.appendChild(rs.rectangle(1, 1, 146, 46, { stroke: ACC, strokeWidth: 1.6, roughness: .8, seed: 11, fill: PAPER, fillStyle: 'solid' }));
+    st.appendChild(rs.rectangle(5, 5, 138, 38, { stroke: ACC, strokeWidth: 1, roughness: .8, seed: 12 }));
+    txt(st, 74, 29, '受控文件 Rev.8', 14, ACC, 600, 'middle'); }
 
-  var ns = 'http://www.w3.org/2000/svg';
-  function stars(g, n, seed, r, tw, yMax){
-    if (!g) return; function rnd(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
-    for (var i = 0; i < n; i++){ var c = document.createElementNS(ns, 'circle'); c.setAttribute('cx', (rnd() * 1440).toFixed(1)); c.setAttribute('cy', (rnd() * yMax).toFixed(1)); c.setAttribute('r', rnd() < .12 ? r * 1.9 : r); var t = tw && rnd() < .08; c.setAttribute('class', 'star' + (t ? ' tw' : '')); if (t) c.style.animationDelay = (rnd() * 4).toFixed(2) + 's'; g.appendChild(c); }
-  }
-  stars(document.getElementById('starsG'), 220, 7, 1, true, 760);
-  stars(document.getElementById('starsG2'), 160, 23, 1, true, 900);
-
-  var rv = document.querySelectorAll('.rv');
-  if ('IntersectionObserver' in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -10% 0px' }); rv.forEach(function(el){ io.observe(el); }); }
-  else { rv.forEach(function(el){ el.classList.add('in'); }); }
-
-  function easeOut(t){ return 1 - Math.pow(1 - t, 4); }
-  function runCount(el){ var target = parseFloat(el.getAttribute('data-count')), start = null, dur = reduce ? 0 : 1600; function step(ts){ if (!start) start = ts; var t = dur ? Math.min(1, (ts - start) / dur) : 1; el.textContent = Math.round(easeOut(t) * target); if (t < 1) requestAnimationFrame(step); } requestAnimationFrame(step); }
-  var counters = document.querySelectorAll('[data-count]');
-  if ('IntersectionObserver' in window){ var cio = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ runCount(e.target); cio.unobserve(e.target); } }); }, { threshold: .5 }); counters.forEach(function(el){ cio.observe(el); }); }
-  else { counters.forEach(runCount); }
-
-  document.querySelectorAll('.ch-head h2').forEach(function(h){ var txt = h.textContent; h.textContent = ''; Array.prototype.forEach.call(txt, function(ch, i){ var sp = document.createElement('span'); sp.className = 'ch'; sp.textContent = ch; sp.style.transitionDelay = (i * 40) + 'ms'; h.appendChild(sp); }); });
-  document.querySelectorAll('[data-src]').forEach(function(el){ var txt = el.textContent; el.textContent = ''; Array.prototype.forEach.call(txt, function(ch, i){ var sp = document.createElement('span'); sp.className = 'ch'; sp.textContent = ch === ' ' ? '\u00a0' : ch; sp.style.transitionDelay = (300 + i * 30) + 'ms'; el.appendChild(sp); }); });
-  document.querySelectorAll('.numbers .wrap, #decisions .wrap, #writing .wrap, #talks .wrap').forEach(function(list){ var i = 0; Array.prototype.forEach.call(list.children, function(r){ if (r.classList.contains('ch-head')) return; r.style.transitionDelay = (Math.min(i++, 10) * 80) + 'ms'; }); });
-
-  var tl = document.querySelector('[data-reveal-words]');
-  if (tl){
-    var words = tl.textContent.trim().split(/\s+/); tl.textContent = '';
-    words.forEach(function(w, i){ var s = document.createElement('span'); s.className = 'w'; s.textContent = w; tl.appendChild(s); if (i < words.length - 1) tl.appendChild(document.createTextNode(' ')); });
-    var ws = tl.querySelectorAll('.w');
-    if (reduce || !('IntersectionObserver' in window)){ ws.forEach(function(s){ s.classList.add('on'); }); }
-    else { var wio = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ var idx = Array.prototype.indexOf.call(ws, e.target); setTimeout(function(){ e.target.classList.add('on'); }, idx * 60); wio.unobserve(e.target); } }); }, { rootMargin: '0px 0px -40% 0px' }); ws.forEach(function(s){ wio.observe(s); }); }
-  }
-
-  var mx = 0, my = 0, hero = document.querySelector('.hero');
-  if (fine && !reduce){
-    document.querySelectorAll('.magnet').forEach(function(b){
-      b.addEventListener('pointermove', function(e){ var r = b.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2); b.classList.add('active'); b.style.transform = 'translate(' + (dx * .18).toFixed(1) + 'px,' + (dy * .18).toFixed(1) + 'px)'; });
-      b.addEventListener('pointerleave', function(){ b.classList.remove('active'); b.style.transform = ''; });
+  /* 高度尺：五站等距，400 與 36,000 之間畫斷尺記號 */
+  var sc = document.getElementById('scaleSvg'), ptr = null;
+  var stations = [{ km: 0, y: 16, label: '0 km' }, { km: 50, y: 138, label: '50' }, { km: 100, y: 260, label: '100' }, { km: 400, y: 382, label: '400' }, { km: 36000, y: 504, label: '36,000' }];
+  if (sc && window.rough){ var rc = rough.svg(sc);
+    sc.appendChild(rc.line(40, 16, 40, 430, { stroke: INK, strokeWidth: 1.4, roughness: 1, seed: 21 }));
+    sc.appendChild(rc.line(40, 456, 40, 504, { stroke: INK, strokeWidth: 1.4, roughness: 1, seed: 22 }));
+    sc.appendChild(rc.linearPath([[40, 430], [34, 437], [46, 449], [40, 456]], { stroke: INK, strokeWidth: 1.4, roughness: .9, seed: 23 }));
+    stations.forEach(function(s, i){
+      sc.appendChild(rc.line(30, s.y, 40, s.y, { stroke: INK, strokeWidth: 1.4, roughness: .8, seed: 30 + i }));
+      txt(sc, 26, s.y + 4, s.label, 12, INK2, null, 'end').setAttribute('font-variant-numeric', 'tabular-nums');
+      if (i < 3) for (var k = 1; k < 4; k++){ var yy = s.y + (stations[i + 1].y - s.y) * k / 4; sc.appendChild(rc.line(36, yy, 40, yy, { stroke: INK2, strokeWidth: 1, roughness: .6, seed: 40 + i * 4 + k })); }
     });
-    window.addEventListener('pointermove', function(e){ mx = e.clientX / window.innerWidth - .5; my = e.clientY / window.innerHeight - .5; if (window.scrollY < hero.offsetHeight) onScroll(); }, { passive: true });
-  }
+    var g = document.createElementNS(NS, 'g'); g.id = 'ptr';
+    g.appendChild(rc.polygon([[46, 0], [56, -5], [56, 5]], { fill: ACC, fillStyle: 'solid', stroke: 'none', roughness: .6, seed: 50 }));
+    g.style.transform = 'translateY(16px)'; sc.appendChild(g); ptr = g; }
 
-  var dot = document.getElementById('railDot'), altEl = document.getElementById('railAlt'), railLbl = document.querySelector('.rail .lbl');
-  var stops = Array.prototype.map.call(document.querySelectorAll('.sec-no'), function(el){ var t = el.textContent.split('・'), num = parseFloat(t[0].replace(/[^\d.]/g, '')); return { el: el.closest('section'), alt: t[0].trim(), km: isNaN(num) ? 0 : num, name: (t[1] || '').trim() }; });
-  var ticks = document.querySelectorAll('.rail .line i'), lastName = '';
-  function fmtKm(v){ return (v >= 1000 ? Math.round(v).toLocaleString('en-US') : String(v < 10 ? Math.round(v * 10) / 10 : Math.round(v))) + ' km'; }
-  var nav = document.querySelector('.nav'), lastY = 0, ticking = false;
-  var gS = document.getElementById('starsG'), gP = document.getElementById('planetG');
-  var film = document.getElementById('film'), filmImg = document.getElementById('filmImg');
-  var links = document.querySelectorAll('.nav-links a');
+  /* 機制圖：地面 → 升空 → 繞行 → 廣播。桌機橫式、手機直式同一支 draw */
+  var ms = document.getElementById('mechSvg');
+  function drawMech(mobile){
+    if (!ms || !window.rough) return; while (ms.firstChild) ms.removeChild(ms.firstChild);
+    var W = mobile ? 360 : 760, H = mobile ? 480 : 320; ms.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    var rc = rough.svg(ms), fs = mobile ? 14 : 16;
+    var L = mobile
+      ? { groundY: 450, box: [24, 392, 130, 48], curve: [[154, 416], [196, 350], [204, 280]], orb: [240, 235, 112], arcs: [240, 235], arcR: [50, 80, 110], arcDir: 'up', paper: [40, 24], screen: [150, 14] }
+      : { groundY: 290, box: [40, 222, 150, 56], curve: [[190, 250], [320, 150], [412, 112]], orb: [470, 110, 116], arcs: [528, 110], arcR: [60, 95, 130], arcDir: 'right', paper: [690, 60], screen: [690, 140] };
+    function G(cls){ var g = document.createElementNS(NS, 'g'); g.setAttribute('class', 'g ' + cls); ms.appendChild(g); return g; }
+    function arrowHead(g, x1, y1, x2, y2, seed){ var a = Math.atan2(y2 - y1, x2 - x1), Ln = 14; [-.45, .45].forEach(function(d, k){ g.appendChild(rc.line(x2, y2, x2 - Ln * Math.cos(a + d), y2 - Ln * Math.sin(a + d), { stroke: INK, strokeWidth: 1.6, roughness: .8, seed: seed + k })); }); }
+    var g1 = G('g1');
+    g1.appendChild(rc.line(0, L.groundY, W, L.groundY, { stroke: INK2, strokeWidth: 1.2, roughness: 1.6, seed: 61 }));
+    g1.appendChild(rc.rectangle(0, L.groundY, W, 14, { fill: INK2, fillStyle: 'hachure', hachureGap: 6, hachureAngle: 60, stroke: 'none', roughness: 1.2, seed: 62 }));
+    txt(g1, 8, L.groundY + 32, '地面', fs, INK2);
+    var g2 = G('g2'), b = L.box;
+    g2.appendChild(rc.rectangle(b[0], b[1], b[2], b[3], { stroke: INK, strokeWidth: 1.6, roughness: 1.3, seed: 63 }));
+    txt(g2, b[0] + b[2] / 2, b[1] + b[3] / 2 + fs * .36, '概念驗證', fs, INK, null, 'middle');
+    var g3 = G('g3'), c = L.curve;
+    g3.appendChild(rc.curve(c, { stroke: INK, strokeWidth: 1.6, roughness: 1.2, seed: 64 }));
+    arrowHead(g3, c[1][0], c[1][1], c[2][0], c[2][1], 65);
+    txt(g3, mobile ? c[1][0] + 12 : c[1][0] - 10, mobile ? c[1][1] + 6 : c[1][1] - 14, '上線', fs, INK2, null, mobile ? 'start' : 'end');
+    var g4 = G('g4'), o = L.orb;
+    g4.appendChild(rc.circle(o[0], o[1], o[2], { stroke: INK, strokeWidth: 1.8, roughness: 1.3, seed: 66 }));
+    g4.appendChild(rc.circle(o[0], o[1], 10, { fill: INK, fillStyle: 'solid', stroke: 'none', seed: 67 }));
+    g4.appendChild(rc.arc(o[0], o[1], o[2] - 30, o[2] - 30, -Math.PI * .9, Math.PI * .75, false, { stroke: INK2, strokeWidth: 1.2, roughness: 1, seed: 68 }));
+    var ax = o[0] + (o[2] / 2 - 15) * Math.cos(Math.PI * .75), ay = o[1] + (o[2] / 2 - 15) * Math.sin(Math.PI * .75);
+    arrowHead(g4, ax - 6, ay - 10, ax, ay, 69);
+    txt(g4, o[0], o[1] + o[2] / 2 + fs + (mobile ? 16 : 6), '全公司日常營運', fs, INK, null, 'middle');
+    var g5 = G('g5'), A = L.arcs, up = L.arcDir === 'up';
+    L.arcR.forEach(function(r, i){ var a0 = up ? -Math.PI * .5 - .7 : -.7, a1 = up ? -Math.PI * .5 + .7 : .7; g5.appendChild(rc.arc(A[0], A[1], r * 2, r * 2, a0, a1, false, { stroke: INK2, strokeWidth: 1.4, roughness: 1.1, seed: 70 + i })); });
+    var p = L.paper; g5.appendChild(rc.rectangle(p[0], p[1], 48, 36, { stroke: INK, strokeWidth: 1.4, roughness: 1.2, seed: 74, fill: PAPER, fillStyle: 'solid' }));
+    [8, 16, 24].forEach(function(dy, i){ g5.appendChild(rc.line(p[0] + 8, p[1] + dy, p[0] + 40 - (i === 2 ? 14 : 0), p[1] + dy, { stroke: INK2, strokeWidth: 1, roughness: .8, seed: 75 + i })); });
+    txt(g5, p[0] + 24, p[1] + 52, '文章', fs - 2, INK2, null, 'middle');
+    var s = L.screen; g5.appendChild(rc.rectangle(s[0], s[1], 48, 30, { stroke: INK, strokeWidth: 1.4, roughness: 1.2, seed: 78, fill: PAPER, fillStyle: 'solid' }));
+    g5.appendChild(rc.line(s[0] + 24, s[1] + 30, s[0] + 24, s[1] + 40, { stroke: INK, strokeWidth: 1.2, roughness: .8, seed: 79 }));
+    g5.appendChild(rc.line(s[0] + 12, s[1] + 46, s[0] + 36, s[1] + 46, { stroke: INK, strokeWidth: 1.2, roughness: .8, seed: 80 }));
+    txt(g5, s[0] + 24, s[1] + 62, '演講', fs - 2, INK2, null, 'middle');
+  }
+  var mq = window.matchMedia('(max-width: 720px)');
+  drawMech(mq.matches);
+  mq.addEventListener('change', function(e){ drawMech(e.matches); });
+  var mech = document.getElementById('mech');
+  if (mech){ if (reduce || !('IntersectionObserver' in window)) mech.classList.add('in');
+    else { var mio = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ mech.classList.add('in'); mio.unobserve(mech); } }); }, { threshold: .3 }); mio.observe(mech); } }
+
+  /* 高度尺指標：站與站之間按像素插值；36,000 到地面站不插值 */
+  var alts = Array.prototype.map.call(document.querySelectorAll('.alt[data-km]'), function(el){ return { el: el.closest('section'), km: el.getAttribute('data-km'), name: el.getAttribute('data-name') }; });
+  var nowKm = document.getElementById('nowKm'), nowName = document.getElementById('nowName');
+  function fmt(v){ return (v >= 1000 ? Math.round(v).toLocaleString('en-US') : String(Math.round(v))) + ' km'; }
+  function yFor(km){ for (var i = 0; i < stations.length - 1; i++){ var a = stations[i], b = stations[i + 1]; if (km >= a.km && km <= b.km){ var t = (km - a.km) / (b.km - a.km); return a.y + (b.y - a.y) * t; } } return km > 36000 ? 504 : 16; }
+  var ticking = false, lastKm = -1;
   function onScroll(){
     if (ticking) return; ticking = true;
     requestAnimationFrame(function(){
-      var max = document.documentElement.scrollHeight - window.innerHeight, y = window.scrollY, p = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
-      if (dot) dot.style.transform = 'translateY(' + (p * dot.parentElement.clientHeight - 4.5).toFixed(1) + 'px)';
-      if (nav){ if (y > 400 && y > lastY + 4) nav.classList.add('hide'); else if (y < lastY - 4 || y <= 400) nav.classList.remove('hide'); }
-      if (Math.abs(y - lastY) > 4) lastY = y;
-      if (hero && !reduce && document.documentElement.classList.contains('launched')){
-        var hp = Math.min(1, y / Math.max(1, hero.offsetHeight));
-        if (gS) gS.style.transform = 'translate(' + (mx * -16).toFixed(1) + 'px,' + (hp * -80 + my * -10).toFixed(1) + 'px)';
-        if (gP) gP.style.transform = 'translate(' + (mx * -6).toFixed(1) + 'px,' + (hp * 220).toFixed(1) + 'px)';
-      }
-      if (film && filmImg && !reduce){ var r = film.getBoundingClientRect(); if (r.bottom > 0 && r.top < window.innerHeight){ var fp = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight; filmImg.style.transform = 'translateY(' + (fp * -70).toFixed(1) + 'px)'; } }
-      var cur = null, nxt = null, ci = -1, mid = y + window.innerHeight * .5;
-      stops.forEach(function(st, i){ if (st.el && st.el.offsetTop <= mid){ cur = st; ci = i; } });
-      nxt = stops[ci + 1] || null;
-      var km = 0, name = '發射台';
-      /* 章內停在該站高度；只在章的最後 30% 往下一站爬升（轉移軌道）；下降段（同步軌道 → 地面站）不插值 */
-      if (cur){ name = cur.name; km = cur.km; if (nxt && nxt.el && nxt.km > cur.km){ var h = cur.el.offsetHeight, st = cur.el.offsetTop + h * .7, pp = h > 0 ? Math.min(1, Math.max(0, (mid - st) / (h * .3))) : 0; if (pp > 0){ km = cur.km + (nxt.km - cur.km) * pp; name = '轉移軌道'; } } }
-      if (altEl && railLbl){ altEl.textContent = cur && isNaN(parseFloat(cur.alt)) && !nxt ? cur.alt : fmtKm(km); railLbl.lastChild.nodeValue = name; }
-      if (name !== lastName){ if (name === '卡門線'){ var dsec = document.getElementById('decisions'); if (dsec) dsec.classList.add('crossed'); if (dot && !reduce){ dot.classList.remove('flash'); void dot.offsetWidth; dot.classList.add('flash'); } } lastName = name; }
-      if (clockTimer && y > hero.offsetHeight){ clearInterval(clockTimer); clockTimer = null; }
-      ticks.forEach(function(t, i){ t.classList.toggle('passed', ci >= i); });
+      var mid = window.scrollY + window.innerHeight * .5, cur = null, ci = -1;
+      alts.forEach(function(a, i){ if (a.el && a.el.offsetTop <= mid){ cur = a; ci = i; } });
+      var km = 0, name = '發射台', label = '0 km', ground = false;
+      if (cur){ name = cur.name; if (cur.km === 'ground'){ ground = true; km = 0; label = '地面站'; } else { km = parseFloat(cur.km); var nxt = alts[ci + 1]; if (nxt && nxt.el && nxt.km !== 'ground'){ var a = cur.el.offsetTop + cur.el.offsetHeight * .7, b = nxt.el.offsetTop, p = b > a ? Math.min(1, Math.max(0, (mid - a) / (b - a))) : 0; if (p > 0){ km = km + (parseFloat(nxt.km) - km) * p; name = '轉移軌道'; } } label = fmt(km); } }
+      if (nowKm) nowKm.textContent = label; if (nowName) nowName.textContent = name;
+      if (ptr){ var y = ground ? 16 : yFor(km); ptr.style.transform = 'translateY(' + y.toFixed(1) + 'px)'; }
       ticking = false;
     });
   }
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
-  var rot = document.getElementById('omapRot'), pts = document.querySelectorAll('.omap .pt'), oName = document.getElementById('omapName'), oNo = document.getElementById('omapNo'), orows = document.querySelectorAll('#writing .orow');
-  function setOrbit(i){ if (!rot) return; rot.style.transform = 'rotate(' + (-i * 72) + 'deg)'; pts.forEach(function(p, k){ p.classList.toggle('on', k === i); }); var h = orows[i].querySelector('h3'); if (oName && h) oName.textContent = h.textContent; if (oNo) oNo.textContent = '0' + (i + 1) + ' / 05'; }
-  if (rot){ setOrbit(0);
-    if ('IntersectionObserver' in window){ var oio = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) setOrbit(Array.prototype.indexOf.call(orows, e.target)); }); }, { rootMargin: '-40% 0px -50% 0px' }); orows.forEach(function(r){ oio.observe(r); }); }
-    if (fine) orows.forEach(function(r, i){ r.addEventListener('pointerenter', function(){ setOrbit(i); }); });
-  }
-
-  var rail = document.querySelector('.rail'), photoZones = document.querySelectorAll('#film, .strip');
-  if (rail && 'IntersectionObserver' in window){ var pio = new IntersectionObserver(function(){ var on = Array.prototype.some.call(photoZones, function(z){ var r = z.getBoundingClientRect(); return r.top < innerHeight * .62 && r.bottom > innerHeight * .38; }); rail.classList.toggle('on-photo', on); }, { threshold: [0, .1, .25, .5, .75, 1] }); photoZones.forEach(function(z){ pio.observe(z); }); }
-
-  var ids = Array.prototype.map.call(links, function(a){ return a.getAttribute('href').slice(1); });
-  if ('IntersectionObserver' in window){ var sio = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ links.forEach(function(a){ a.setAttribute('aria-current', a.getAttribute('href') === '#' + e.target.id ? 'true' : 'false'); }); } }); }, { rootMargin: '-40% 0px -50% 0px' }); ids.forEach(function(id){ var el = document.getElementById(id); if (el) sio.observe(el); }); }
+  /* 導覽目前章節 */
+  var links = document.querySelectorAll('.nav ul a');
+  if ('IntersectionObserver' in window){ var sio = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ links.forEach(function(a){ a.setAttribute('aria-current', a.getAttribute('href') === '#' + e.target.id ? 'true' : 'false'); }); } }); }, { rootMargin: '-40% 0px -50% 0px' });
+    links.forEach(function(a){ var el = document.getElementById(a.getAttribute('href').slice(1)); if (el) sio.observe(el); }); }
 })();
 </script>
 </body>
