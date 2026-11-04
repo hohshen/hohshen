@@ -1,0 +1,21 @@
+# cargo-deny：CI 的 deps job 與每週排程都會跑 `cargo deny check advisories bans sources`。
+# 遇到漏洞公告：先升級套件（cargo update -p <crate>）。確定不影響本站才在 ignore 加一筆，並寫明理由與日期。
+
+[graph]
+targets = ["wasm32-unknown-unknown", "x86_64-unknown-linux-gnu"]
+all-features = true
+
+[advisories]
+# 有漏洞就失敗；unmaintained 只對直接依賴報錯
+unmaintained = "workspace"
+yanked = "deny"
+ignore = []
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

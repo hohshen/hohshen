@@ -34,7 +34,7 @@ pub fn App() -> impl IntoView {
         <Nav menu_open current/>
         <div class="wash" id="wash" aria-hidden="true"></div>
         <div class="flash" id="flash" aria-hidden="true"></div>
-        <div class="kline" id="kline" aria-hidden="true"><i></i><b>"100 km"</b><span>"KÁRMÁN LINE ・ 離開大氣層"</span></div>
+        <div class="kline" id="kline" aria-hidden="true"><i></i><b>"100 km"</b><span>"KÁRMÁN LINE　離開大氣層"</span></div>
         <div class="hud" aria-hidden="true"><b id="hudKm">{move || hud.get().0}</b><span id="hudName">{move || hud.get().1}</span></div>
         <main id="main">
             <Hero/>

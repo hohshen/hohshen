@@ -34,3 +34,9 @@ cd dist && python3 -m http.server 8765    # http://localhost:8765/
 
 push 到 `main` 就會由 `.github/workflows/pages.yml` 建置並發佈到 GitHub Pages。
 CI 會先重跑預渲染，`index.html` 跟元件對不上就失敗；改了 `src/` 的內容，記得先跑 `./build.sh` 再一起 commit。
+
+## CI 檢查
+
+每個 job 擋什麼、失敗怎麼修，見 `AGENTS.md` 的「CI」一節。
+
+定期清理（依賴漏洞、外部連結）不設排程，要手動到 Actions → Maintenance → Run workflow。

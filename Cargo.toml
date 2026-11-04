@@ -42,3 +42,12 @@ opt-level = "z"
 lto = true
 codegen-units = 1
 panic = "abort"
+
+[dev-dependencies]
+regex = "1"
+
+# 結構測試與內容規則：cargo test --features ssr --test site_rules
+[[test]]
+name = "site_rules"
+path = "tests/site_rules.rs"
+required-features = ["ssr"]
