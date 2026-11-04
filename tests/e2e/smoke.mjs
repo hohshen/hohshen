@@ -122,7 +122,11 @@ async function run({ tag, width, height, reduce }) {
 
     const r = await ev(`(async () => {
       const s = (ms) => new Promise((r) => setTimeout(r, ms));
-      document.getElementById('writing').scrollIntoView(); dispatchEvent(new Event('scroll')); await s(1500);
+      // 走使用者的路徑：點導覽的「寫作」（桌面由 Lenis 平滑捲動），等高度讀數到位，最多 8 秒
+      document.querySelector('a[href="#writing"]').click();
+      const hud = () => document.getElementById('hudKm').textContent;
+      for (let i = 0; i < 80 && hud() !== '400 km'; i++) { dispatchEvent(new Event('scroll')); await s(100); }
+      await s(300);
       const out = {
         hud: document.getElementById('hudKm').textContent + ' / ' + document.getElementById('hudName').textContent,
         nav: [...document.querySelectorAll('.nav ul a')].filter((a) => a.getAttribute('aria-current') === 'true').map((a) => a.textContent).join(','),
