@@ -4,3 +4,5 @@ archive/
 target/
 dist/
 tests/e2e/out/
+lhci/
+.lighthouseci/

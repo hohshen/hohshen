@@ -5,6 +5,7 @@
 //! 4. <img> 都有 alt、width、height
 //! 5. 頁內錨點 href="#x" 都對得到 id
 //! 6. 禁用詞：公開清單 tests/forbidden-public.txt ＋ 不公開清單（環境變數 FORBIDDEN_TERMS 或本機 docs/forbidden.txt）
+//! 7. JSON-LD（Person）：格式正確，網址與 og:url 一致，圖片存在，頁尾的社群連結都列在 sameAs
 //!
 //! 每條失敗訊息都寫明怎麼修。執行：cargo test --features ssr --test site_rules
 
@@ -161,4 +162,47 @@ fn no_forbidden_terms() {
         }
     }
     report(problems, "出現禁用詞");
+}
+
+#[test]
+fn json_ld_person_is_valid_and_consistent() {
+    let index = read("index.html");
+    let blocks: Vec<&str> = Regex::new(r#"(?s)<script type="application/ld\+json">(.*?)</script>"#)
+        .unwrap()
+        .captures_iter(&index)
+        .map(|c| c.get(1).unwrap().as_str())
+        .collect();
+    assert_eq!(blocks.len(), 1, "index.html 的 head 應該剛好有一段 JSON-LD（Person），目前 {} 段", blocks.len());
+    let ld: serde_json::Value = serde_json::from_str(blocks[0]).unwrap_or_else(|e| panic!("index.html 的 JSON-LD 不是合法 JSON：{e}。請修正逗號或引號"));
+    let s = |k: &str| ld.get(k).and_then(|v| v.as_str()).unwrap_or("").to_string();
+    let mut problems = Vec::new();
+    if s("@context") != "https://schema.org" {
+        problems.push("@context 必須是 \"https://schema.org\"".to_string());
+    }
+    if s("@type") != "Person" {
+        problems.push("@type 必須是 \"Person\"".to_string());
+    }
+    for k in ["name", "alternateName", "jobTitle", "url", "image"] {
+        if s(k).is_empty() {
+            problems.push(format!("缺少 {k}：在 index.html 的 JSON-LD 補上"));
+        }
+    }
+    let og_url = Regex::new(r#"<meta property="og:url" content="([^"]+)""#).unwrap().captures(&index).map(|c| c[1].to_string()).unwrap_or_default();
+    if s("url") != og_url {
+        problems.push(format!("JSON-LD 的 url（{}）與 og:url（{og_url}）不一致：兩處改成同一個網址", s("url")));
+    }
+    if let Some(img) = s("image").strip_prefix(og_url.as_str()) {
+        if !Path::new(ROOT).join(img).exists() {
+            problems.push(format!("JSON-LD 的 image 指向 {img}，但 repo 裡沒有這個檔案：改成 img/ 下存在的圖片"));
+        }
+    } else {
+        problems.push(format!("JSON-LD 的 image（{}）要放在站內（以 {og_url} 開頭）", s("image")));
+    }
+    let same_as: BTreeSet<String> = ld.get("sameAs").and_then(|v| v.as_array()).map(|a| a.iter().filter_map(|v| v.as_str().map(str::to_string)).collect()).unwrap_or_default();
+    for (href, name, blank) in hohshen_site::content::FOOTER_LINKS {
+        if blank && !same_as.contains(href) {
+            problems.push(format!("頁尾的 {name}（{href}）沒有列在 JSON-LD 的 sameAs：搜尋引擎靠它把各平台帳號連到同一個人，請補上"));
+        }
+    }
+    report(problems, "JSON-LD 不完整或與頁面不一致");
 }

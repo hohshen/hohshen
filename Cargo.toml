@@ -45,6 +45,7 @@ panic = "abort"
 
 [dev-dependencies]
 regex = "1"
+serde_json = "1"
 
 # 結構測試與內容規則：cargo test --features ssr --test site_rules
 [[test]]

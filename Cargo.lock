@@ -509,6 +509,7 @@ dependencies = [
  "js-sys",
  "leptos",
  "regex",
+ "serde_json",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",

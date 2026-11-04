@@ -1,5 +1,6 @@
-# 檢查 → 建置 → 發佈到 GitHub Pages。
+# 檢查 → 建置 → 發佈到 GitHub Pages → 驗證線上網站。
 # 四個檢查 job 並行，全部通過才建置；PR 只跑檢查與建置，不發佈。
+# 發佈後對正式網址再跑一次 E2E：目標是「線上網站一直是好的」，不只是「這次 push 測過」。
 # 第三方 action 一律釘 commit SHA（註解是版本）；Dependabot 會開 PR 更新。
 # repo 的 Settings → Pages → Source 必須是「GitHub Actions」。
 name: Deploy Pages
@@ -85,9 +86,11 @@ jobs:
         run: ./scripts/check-docs.sh
 
   build:
-    name: 建置＋E2E 冒煙測試
+    name: 建置＋E2E 冒煙測試＋Lighthouse
     needs: [deps, workflow-lint, secrets, checks]
     runs-on: ubuntu-latest
+    outputs:
+      wasm: ${{ steps.wasm.outputs.name }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -108,8 +111,44 @@ jobs:
       - name: 建置
         run: trunk build --release --locked
 
+      - name: 記下這次的 wasm 檔名（發佈後用來確認線上已更新）
+        id: wasm
+        run: echo "name=$(basename dist/*_bg.wasm)" >> "$GITHUB_OUTPUT"
+
       - name: E2E 冒煙測試＋效能預算
         run: node tests/e2e/smoke.mjs
+
+      # 無障礙（內含 axe-core）、最佳實務、SEO 必須滿分；效能在軟體 GPU 上不準，只列報告
+      - name: Lighthouse（無障礙、最佳實務、SEO 滿分）
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: |
+          npx -y @lhci/cli@0.15.1 autorun || {
+            echo "::error::Lighthouse 門檻未過。下載 artifact lighthouse 的 HTML 報告看哪一項扣分；常見是文字對比（style/site.css 的 --ice-2／--ice-3）或缺 alt"
+            exit 1
+          }
+
+      - name: Lighthouse 分數寫進摘要
+        if: always()
+        run: |
+          [ -f lhci/manifest.json ] || exit 0
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          m = json.load(open("lhci/manifest.json"))
+          print("### Lighthouse\n\n| 項目 | 分數 |\n|---|---|")
+          for k, v in m[0]["summary"].items():
+              note = "（軟體 GPU，僅供參考）" if k == "performance" else ""
+              print(f"| {k} | {round(v * 100)}{note} |")
+          PY
+
+      - name: 上傳 Lighthouse 報告
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: lighthouse
+          path: lhci/
+          retention-days: 7
+          if-no-files-found: ignore
 
       - name: 上傳截圖
         if: always()
@@ -142,3 +181,38 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  verify-live:
+    name: 驗證線上網站
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    env:
+      SITE: https://hohshen.github.io/hohshen/
+      WASM: ${{ needs.build.outputs.wasm }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: 等 CDN 換上這次的版本（最多 5 分鐘）
+        run: |
+          for i in $(seq 1 30); do
+            curl -fsS "$SITE" | grep -q "$WASM" && { echo "線上已是 $WASM"; exit 0; }
+            sleep 10
+          done
+          echo "::error::5 分鐘後線上仍不是這次建置的 $WASM。到 Settings → Pages 確認來源是 GitHub Actions，或看 deploy job 的 log"
+          exit 1
+
+      - name: 對正式網址跑 E2E
+        env:
+          SMOKE_URL: ${{ env.SITE }}
+        run: node tests/e2e/smoke.mjs
+
+      - name: 上傳截圖
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: screenshots-live
+          path: tests/e2e/out/
+          retention-days: 7
+          if-no-files-found: ignore
