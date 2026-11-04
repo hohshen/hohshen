@@ -24,8 +24,8 @@
 rustup target add wasm32-unknown-unknown
 cargo install trunk --locked     # 0.22.1
 
-./build.sh                       # 預渲染寫回 index.html → trunk build --release → dist/
-cd dist && python3 -m http.server 8765    # http://localhost:8765/
+./preview.sh                     # 建置後在 http://localhost:8765/ 預覽並開瀏覽器
+./build.sh                       # 只建置：預渲染寫回 index.html → trunk build --release → dist/
 ```
 
 開發時可用 `trunk serve`（不會更新預渲染）。

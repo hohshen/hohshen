@@ -28,7 +28,7 @@ fn page() -> String {
 /// 頁面上所有 id；另加 index.html 範本本身的固定元素（#app 外的兩個 canvas 與 #app）
 fn ids(html: &str) -> BTreeSet<String> {
     let mut out: BTreeSet<String> = Regex::new(r#"\sid="([^"]+)""#).unwrap().captures_iter(html).map(|c| c[1].to_string()).collect();
-    for fixed in ["warp", "webgl", "app"] {
+    for fixed in ["warp", "webgl", "app", "dev-hint"] {
         out.insert(fixed.to_string());
     }
     out
