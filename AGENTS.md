@@ -36,6 +36,8 @@
 ./build.sh                                        # 預渲染 → trunk build → dist/
 cargo test --features ssr --test site_rules       # 結構測試與內容規則
 node tests/e2e/smoke.mjs                          # E2E 冒煙測試＋效能預算（需要 Chrome）
+SMOKE_URL=https://hohshen.github.io/hohshen/ node tests/e2e/smoke.mjs   # 測線上網站
+npx @lhci/cli@0.15.1 autorun                      # Lighthouse（先 ./build.sh）
 cargo deny check advisories bans sources          # 依賴漏洞
 ./scripts/check-docs.sh                           # 本檔與 README-dev.md 提到的路徑都存在
 ```
@@ -48,8 +50,12 @@ cargo deny check advisories bans sources          # 依賴漏洞
 | workflow 安全 | 權限過寬、模板注入、未釘 SHA 的 action | 照 zizmor 訊息改 `.github/`（本機：`uvx zizmor .github/`） |
 | 金鑰外洩 | commit 裡的 token、金鑰 | 撤銷那把金鑰，再從歷史移除 |
 | 結構與內容規則 | vendor 雜湊、預渲染過期、Rust↔JS／CSS 契約、連結、圖片、禁用詞、文件路徑 | 錯誤訊息會寫修法 |
-| 建置＋E2E | wasm gzip ≤ 130 KB、頁面開得起來、console 零錯誤、高度讀數、目錄開關 | 看 log 與 artifact 的截圖 |
+| 建置＋E2E＋Lighthouse | wasm gzip ≤ 130 KB、頁面開得起來、console 零錯誤、高度讀數、目錄開關；Lighthouse 無障礙／最佳實務／SEO 滿分（效能只列報告） | 看 log、artifact 的截圖與 Lighthouse HTML 報告 |
 | 發佈 | 只在 push 到 main 或手動觸發時跑 | |
+| 驗證線上網站 | 等 CDN 換上這次的 wasm，再對正式網址跑 E2E | 看 artifact `screenshots-live`；常見是 Pages 來源不是 GitHub Actions |
 
-`.github/workflows/maintenance.yml` 是手動觸發的定期清理：重掃依賴漏洞與外部連結，有問題會開 issue。
+`.github/workflows/maintenance.yml` 是手動觸發的定期清理：重掃依賴漏洞、外部連結、線上網站 E2E，有問題會開 issue。
+
+`index.html` 的 head 有 Person JSON-LD（搜尋引擎用），`tests/site_rules.rs` 會檢查它與 og:url、頁尾社群連結一致。
+Lighthouse 設定在 `lighthouserc.json`。
 Dependabot（`.github/dependabot.yml`）每週開依賴更新 PR。

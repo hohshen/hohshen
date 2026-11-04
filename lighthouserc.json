@@ -1,0 +1,25 @@
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": "./dist",
+      "numberOfRuns": 1,
+      "settings": {
+        "chromeFlags": "--headless=new --no-sandbox --use-angle=swiftshader --enable-unsafe-swiftshader",
+        "maxWaitForLoad": 90000,
+        "onlyCategories": ["performance", "accessibility", "best-practices", "seo"]
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:accessibility": ["error", { "minScore": 1 }],
+        "categories:seo": ["error", { "minScore": 1 }],
+        "categories:best-practices": ["error", { "minScore": 1 }],
+        "categories:performance": "off"
+      }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": "./lhci"
+    }
+  }
+}

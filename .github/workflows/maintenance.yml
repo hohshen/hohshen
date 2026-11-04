@@ -1,4 +1,4 @@
-# 定期清理（手動觸發）：重掃依賴漏洞、檢查站上外部連結是否失效，有問題就開 issue。
+# 定期清理（手動觸發）：重掃依賴漏洞、檢查站上外部連結是否失效、對線上網站跑 E2E，有問題就開 issue。
 # 不設排程：public repo 60 天沒活動時 GitHub 會自動停用排程。到 Actions → Maintenance → Run workflow 手動跑。
 name: Maintenance
 
@@ -36,12 +36,20 @@ jobs:
           output: lychee.md
           fail: true
 
+      - name: 線上網站 E2E
+        id: live
+        continue-on-error: true
+        env:
+          SMOKE_URL: https://hohshen.github.io/hohshen/
+        run: node tests/e2e/smoke.mjs
+
       - name: 有問題就開 issue（同名且未關閉的 issue 改成留言）
-        if: steps.deny.outcome == 'failure' || steps.links.outcome == 'failure'
+        if: steps.deny.outcome == 'failure' || steps.links.outcome == 'failure' || steps.live.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
           DENY: ${{ steps.deny.outcome }}
           LINKS: ${{ steps.links.outcome }}
+          LIVE: ${{ steps.live.outcome }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           title="定期清理發現問題"
@@ -50,6 +58,7 @@ jobs:
             echo
             echo "- 依賴漏洞（cargo-deny）：$DENY"
             echo "- 外部連結（lychee）：$LINKS"
+            echo "- 線上網站 E2E：$LIVE"
             [ -f lychee.md ] && { echo; cat lychee.md; }
             echo
             echo "處理方式見 AGENTS.md 的 CI 表格：依賴漏洞照「失敗怎麼修」；連結失效就到 src/content.rs 換掉網址。"

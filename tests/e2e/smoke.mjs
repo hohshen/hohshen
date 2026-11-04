@@ -2,6 +2,7 @@
 //
 //   ./build.sh && node tests/e2e/smoke.mjs            # 測 dist/
 //   CHROME=/path/to/chrome node tests/e2e/smoke.mjs    # 指定 Chrome
+//   SMOKE_URL=https://hohshen.github.io/hohshen/ node tests/e2e/smoke.mjs   # 測線上網站（不跑本機伺服器與體積預算）
 //
 // 在 /hohshen/ 子路徑伺服 dist/（模擬 GitHub Pages），用無頭 Chrome 跑三種設定：
 // 桌面 1440×900、手機 390×844、減少動態效果。截圖存到 tests/e2e/out/。
@@ -34,18 +35,23 @@ const warn = (msg) => { warnings.push(msg); console.log(`  ! ${msg}`); };
 const pass = (msg) => console.log(`  ✓ ${msg}`);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// ── 預算：wasm 體積 ──
-if (!fs.existsSync(path.join(DIST, 'index.html'))) {
+const LIVE = process.env.SMOKE_URL || '';
+fs.mkdirSync(OUT, { recursive: true });
+
+// ── 預算：wasm 體積（只測本機 dist/）──
+if (LIVE) {
+  console.log(`測線上網站：${LIVE}`);
+} else if (!fs.existsSync(path.join(DIST, 'index.html'))) {
   console.error('找不到 dist/index.html：請先跑 ./build.sh');
   process.exit(1);
-}
-fs.mkdirSync(OUT, { recursive: true });
+} else {
 console.log('預算');
 const wasm = fs.readdirSync(DIST).find((f) => f.endsWith('_bg.wasm'));
 const gz = zlib.gzipSync(fs.readFileSync(path.join(DIST, wasm)), { level: 9 }).length / 1024;
 gz <= HARD.wasmGzipKB
   ? pass(`wasm gzip ${gz.toFixed(1)} KB ≤ ${HARD.wasmGzipKB} KB`)
   : fail(`wasm gzip ${gz.toFixed(1)} KB 超過 ${HARD.wasmGzipKB} KB：檢查是否新增了大型依賴（cargo tree），或確認 Cargo.toml 的 release profile 仍是 opt-level="z"、lto=true`);
+}
 
 // ── 靜態伺服器：/hohshen/ → dist/ ──
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.wasm': 'application/wasm', '.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml' };
@@ -59,8 +65,8 @@ const server = http.createServer((req, res) => {
   res.writeHead(200, { 'content-type': TYPES[path.extname(file)] || 'application/octet-stream' });
   fs.createReadStream(file).pipe(res);
 });
-await new Promise((r) => server.listen(0, '127.0.0.1', r));
-const PAGE = `http://127.0.0.1:${server.address().port}${BASE}`;
+if (!LIVE) await new Promise((r) => server.listen(0, '127.0.0.1', r));
+const PAGE = LIVE || `http://127.0.0.1:${server.address().port}${BASE}`;
 
 // ── Chrome ──
 const CHROME = process.env.CHROME || [
@@ -159,9 +165,9 @@ for (const cfg of [
   { tag: 'reduced', width: 1440, height: 900, reduce: true },
 ]) await run(cfg);
 
-server.close();
+if (!LIVE) server.close();
 console.log(`\n結果：${errors.length} 個失敗、${warnings.length} 個警告。截圖在 ${path.relative(ROOT, OUT)}/`);
 if (process.env.GITHUB_STEP_SUMMARY) {
-  fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### E2E 冒煙測試\n\n- 失敗：${errors.length}\n- 警告：${warnings.length}\n${[...errors, ...warnings].map((m) => `- ${m}`).join('\n')}\n`);
+  fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### E2E 冒煙測試${LIVE ? `（線上 ${LIVE}）` : ''}\n\n- 失敗：${errors.length}\n- 警告：${warnings.length}\n${[...errors, ...warnings].map((m) => `- ${m}`).join('\n')}\n`);
 }
 process.exit(errors.length ? 1 : 0);

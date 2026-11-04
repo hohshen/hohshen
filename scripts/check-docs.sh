@@ -12,6 +12,6 @@ for doc in AGENTS.md README-dev.md; do
       fail=1
     fi
   done < <(grep -oE '`[^` ]+`' "$doc" | tr -d '`' | sed -E 's/:[0-9]+$//' \
-    | grep -E '^(src|js|style|tests|scripts|vendor|img|\.github)/|^(index\.html|Cargo\.toml|Trunk\.toml|build\.sh|deny\.toml|AGENTS\.md|README(-dev)?\.md)$' | sort -u)
+    | grep -E '^(src|js|style|tests|scripts|vendor|img|\.github)/|^(index\.html|Cargo\.toml|Trunk\.toml|build\.sh|deny\.toml|lighthouserc\.json|AGENTS\.md|README(-dev)?\.md)$' | sort -u)
 done
 [ "$fail" = 0 ] && echo "文件路徑檢查：通過" || exit 1
