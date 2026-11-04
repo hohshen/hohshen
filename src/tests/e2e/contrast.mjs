@@ -6,6 +6,7 @@
 //
 //   cd src && ./build.sh && node tests/e2e/contrast.mjs
 //
+// Chrome 以 --hide-scrollbars 啟動：Linux 會畫實體捲軸，貼近畫面底部的文字會被量到捲軸的灰色。
 // 門檻：WCAG AA，一般字 4.5:1，大字（≥ 24px，或 ≥ 18.66px 且粗體）3:1。
 // 失敗時：調暗那個位置的 3D 背景（src/js/scene.js 的銀河亮度、構圖），或在 src/style/site.css 加深文字後方的遮罩。
 
@@ -66,7 +67,7 @@ fs.mkdirSync(OUT, { recursive: true });
 
 const W = 1440, H = 900, port = 9200 + Math.floor(Math.random() * 90);
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'contrast-'));
-const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, `--window-size=${W},${H}`, '--use-angle=swiftshader', '--enable-unsafe-swiftshader', ...(process.env.CI ? ['--no-sandbox'] : []), 'about:blank'], { stdio: 'ignore' });
+const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, `--window-size=${W},${H}`, '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--hide-scrollbars', ...(process.env.CI ? ['--no-sandbox'] : []), 'about:blank'], { stdio: 'ignore' });
 let target; for (let i = 0; i < 80 && !target; i++) { try { target = await (await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: 'PUT' })).json(); } catch { await sleep(250); } }
 const ws = new WebSocket(target.webSocketDebuggerUrl); let id = 0; const pending = new Map();
 ws.onmessage = (e) => { const m = JSON.parse(e.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m.result); pending.delete(m.id); } };
