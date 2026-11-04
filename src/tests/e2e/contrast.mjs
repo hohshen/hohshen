@@ -21,7 +21,10 @@ const ROOT = path.resolve(import.meta.dirname, '../..');
 const DIST = path.join(ROOT, 'dist');
 const OUT = path.join(import.meta.dirname, 'out');
 const BASE = '/hohshen/';
-const STOPS = [['hero', 0], ['record', 0.12], ['how', 0.27], ['decisions', 0.36], ['writing', 0.55], ['talks', 0.7], ['about', 0.86], ['dock', 0.94], ['end', 1]];
+const ALL_STOPS = [['hero', 0], ['record', 0.12], ['how', 0.27], ['decisions', 0.36], ['writing', 0.55], ['talks', 0.7], ['about', 0.86], ['dock', 0.94], ['end', 1]];
+/* 本機調整時可只量幾站：ONLY=dock,end node tests/e2e/contrast.mjs（CI 一律全量） */
+const ONLY = (process.env.ONLY || '').split(',').filter(Boolean);
+const STOPS = ONLY.length ? ALL_STOPS.filter(([n]) => ONLY.includes(n)) : ALL_STOPS;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ── PNG 解碼（CDP 截圖是 8-bit RGBA，非交錯）──
@@ -79,6 +82,12 @@ await send('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceSc
 await send('Page.navigate', { url: PAGE });
 for (let i = 0; i < 300; i++) { if (await ev(`document.body?.classList.contains('intro-done')`)) break; await sleep(200); }
 await sleep(3000);
+/* 銀河貼圖是開場後分批烘焙的；沒烘完就量，會量到「沒有銀河」的背景而誤判通過。 */
+if (await ev(`!!window.__scene?.galaxy`)) {
+  let baked = false;
+  for (let i = 0; i < 240 && !baked; i++) { baked = await ev(`!!window.__scene.galaxy.userData.baked`); if (!baked) await sleep(500); }
+  if (!baked) { console.log('✗ 銀河貼圖 120 秒內沒烘焙完，對比量不準。檢查 src/js/scene.js 的 bakeJob'); process.exitCode = 1; }
+}
 
 const failures = [];
 let worst = Infinity;
@@ -137,4 +146,4 @@ const uniq = [...new Set(failures)];
 uniq.slice(0, 30).forEach((f) => console.log('  - ' + f));
 console.log(`\n結果：${uniq.length} 段文字對比不足；最差的一段是門檻的 ${(worst * 100).toFixed(0)}%。截圖在 ${path.relative(ROOT, OUT)}/contrast-*.png`);
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### 真實背景對比\n\n- 不足：${uniq.length} 段\n${uniq.slice(0, 30).map((f) => `- ${f}`).join('\n')}\n`);
-process.exit(uniq.length ? 1 : 0);
+process.exit(uniq.length || process.exitCode ? 1 : 0);
