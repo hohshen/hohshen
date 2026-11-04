@@ -26,12 +26,13 @@ jobs:
         with:
           command: check advisories
 
+      # 403／429／999：網站擋機器人（LinkedIn 一律回 999），不代表連結失效
       - name: 外部連結
         id: links
         continue-on-error: true
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
-          args: --no-progress --max-retries 3 --accept 200..=299,403,429 --exclude '^mailto:' index.html README.md
+          args: --no-progress --max-retries 3 --accept 200..=299,403,429,999 --exclude '^mailto:' index.html README.md
           output: lychee.md
           fail: true
 
@@ -51,7 +52,7 @@ jobs:
             echo "- 外部連結（lychee）：$LINKS"
             [ -f lychee.md ] && { echo; cat lychee.md; }
             echo
-            echo "處理方式見 AGENTS.md 的「CI 失敗怎麼修」。"
+            echo "處理方式見 AGENTS.md 的 CI 表格：依賴漏洞照「失敗怎麼修」；連結失效就到 src/content.rs 換掉網址。"
           } > body.md
           num=$(gh issue list --state open --search "in:title $title" --json number --jq '.[0].number')
           if [ -n "$num" ]; then gh issue comment "$num" --body-file body.md; else gh issue create --title "$title" --body-file body.md; fi
