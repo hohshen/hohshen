@@ -26,7 +26,7 @@ const webgl = hasWebGL();
 if (!webgl) document.body.classList.add('no-webgl');
 
 /* ── 場景 ── */
-let composer, renderer, camera, scene, planet, atmo, ring, sat, stars, grainPass, planetMat, skyDome, clouds, running = true, rafId = 0;
+let composer, renderer, camera, scene, planet, atmo, ring, sat, stars, grainPass, planetMat, skyDome, clouds, galaxy, galaxyStars, running = true, rafId = 0;
 const state = {
   camY:   { current: 0.15, target: 0.15, ease: 0.06 },
   camZ:   { current: mobile ? 4.2 : 3.4,  target: mobile ? 4.2 : 3.4,  ease: 0.06 },
@@ -111,23 +111,131 @@ if (webgl){
       }` }));
   skyDome.renderOrder = -1; scene.add(skyDome);
 
-  /* 雲層：高度 0.012，從下方被城市燈打亮，從上方蓋住部分燈火 */
+  /* 雲層：高度 0.02。兩種尺度——
+     大尺度：渦旋扭曲的天氣系統＋緯度雲帶，從軌道上看得出氣旋與雲帶；
+     小尺度：只在鏡頭靠近地面時計算，從下往上看是一團團的雲。
+     受光：白天側亮白、晨昏線偏暖、夜晚側是月光藍灰；從地面往上看則被城市燈從下方打亮。 */
+  const sunDir = sun.position.clone().normalize();
   clouds = new THREE.Mesh(new THREE.SphereGeometry(1.02, mobile ? 192 : 320, mobile ? 96 : 160), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide,
-    uniforms: { uTime: { value: 0 }, uCamR: { value: 1 }, uAmt: { value: 1 } },
-    vertexShader: `varying vec3 vPos; void main(){ vPos = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-    fragmentShader: `precision mediump float; uniform float uTime; uniform float uCamR; uniform float uAmt; varying vec3 vPos;
+    uniforms: { uTime: { value: 0 }, uCamR: { value: 1 }, uAmt: { value: 1 }, uSun: { value: sunDir } },
+    vertexShader: `varying vec3 vPos; varying vec3 vN; varying vec3 vW;
+      void main(){ vPos = position; vN = normalize(mat3(modelMatrix) * position); vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+    fragmentShader: `precision highp float; uniform float uTime; uniform float uCamR; uniform float uAmt; uniform vec3 uSun; varying vec3 vPos; varying vec3 vN; varying vec3 vW;
       float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,37.719))) * 43758.5453); }
       float n(vec3 p){ vec3 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(mix(h(i),h(i+vec3(1,0,0)),f.x),mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),mix(mix(h(i+vec3(0,0,1)),h(i+vec3(1,0,1)),f.x),mix(h(i+vec3(0,1,1)),h(i+vec3(1,1,1)),f.x),f.y),f.z); }
       void main(){
-        vec3 p = vPos * 110.0 + vec3(uTime * 0.02, 0.0, 0.0);
-        float f = n(p) * 0.55 + n(p * 2.3) * 0.3 + n(p * 5.1) * 0.15;
-        float a = smoothstep(0.58, 0.8, f);
+        vec3 d = normalize(vPos);
+        /* 大尺度天氣系統：用兩個雜訊扭曲座標，做出捲曲的氣旋 */
+        vec3 q = d * 4.6 + vec3(uTime * 0.004, 0.0, 0.0);
+        vec2 w = vec2(n(q * 1.3 + 11.0), n(q * 1.3 + 37.0)) - 0.5;
+        q += vec3(w.x, w.y * 0.6, -w.x) * 0.9;
+        float big = n(q) * 0.48 + n(q * 2.03) * 0.26 + n(q * 4.1) * 0.16 + n(q * 8.3) * 0.1;
+        big += 0.1 * cos(d.y * 9.0);                                  /* 赤道與中緯度雲帶 */
+        float f = big;
+        /* 小尺度細節：鏡頭在雲層附近才算（uniform 分支，不浪費） */
+        if (uCamR < 1.35){ vec3 p = vPos * 110.0 + vec3(uTime * 0.02, 0.0, 0.0); f = big * 0.62 + (n(p) * 0.6 + n(p * 2.3) * 0.4) * 0.38; }
+        float a = smoothstep(0.46, 0.66, f);
+        float core = smoothstep(0.55, 0.78, f);                        /* 厚的地方更亮、更不透明 */
         float below = step(uCamR, 1.02);
-        vec3 col = mix(vec3(0.07, 0.08, 0.11), vec3(0.1, 0.08, 0.08), below);
-        a *= smoothstep(0.0015, 0.008, abs(uCamR - 1.02));        /* 穿過時改由後製霧接手，不會整片跳出來 */
-        gl_FragColor = vec4(col, a * mix(0.75, 0.55, below) * uAmt);
+        vec3 N = normalize(vN);
+        float ndl = dot(N, uSun);
+        float day = smoothstep(-0.12, 0.3, ndl);
+        vec3 dayCol = mix(vec3(0.7, 0.74, 0.8), vec3(1.0, 0.99, 0.97), core) * (0.45 + 0.55 * max(ndl, 0.0));
+        vec3 nightCol = mix(vec3(0.2, 0.23, 0.29), vec3(0.34, 0.38, 0.45), core);    /* 背光側：比地表亮一階的灰白，才讀得出是雲 */
+        vec3 dusk = vec3(1.0, 0.6, 0.38) * exp(-pow((ndl - 0.02) * 12.0, 2.0)) * 0.22;  /* 晨昏線只留一條細暖邊 */
+        vec3 above = mix(nightCol, dayCol, day) + dusk;
+        vec3 fromBelow = mix(vec3(0.12, 0.10, 0.10), vec3(0.22, 0.16, 0.13), core);
+        vec3 col = mix(above, fromBelow, below);
+        /* 斜看地球邊緣時，視線穿過的雲比較多，看起來更厚 */
+        vec3 V = normalize(cameraPosition - vW);
+        float limb = 1.0 - abs(dot(N, V));
+        float alpha = a * (0.78 + 0.22 * core) * mix(1.0, 1.3, limb * (1.0 - below)) * mix(0.95, 0.8, below);
+        alpha *= smoothstep(0.0015, 0.008, abs(uCamR - 1.02));         /* 穿過時改由後製霧接手，不會整片跳出來 */
+        gl_FragColor = vec4(col, min(alpha, 0.97) * uAmt);
       }` }));
   scene.add(clouds);
+
+  /* 銀河與遠方星系：用 GPU 把全天空烘焙成一張等距長方貼圖（只算一次），之後每幀只讀貼圖。
+     烘焙在開場結束後分 48 條、每幀一條做完（約 0.8 秒），不會卡住開場；靠近地面時本來就看不到銀河。
+     銀河核心放在最後一章「對接」鏡頭仰望的方向。 */
+  const gC = new THREE.Vector3(-0.38, 0.46, -0.8).normalize();             /* 銀河核心 */
+  const gN = new THREE.Vector3().crossVectors(gC, new THREE.Vector3(1, 0.62, 0.1).normalize()).normalize();  /* 銀河盤面的法線 */
+  const gT = new THREE.Vector3().crossVectors(gN, gC).normalize();
+  const andro = new THREE.Vector3(0.52, 0.58, -0.63).normalize();           /* 仙女座星系 */
+  const SKY_W = mobile ? 2048 : 3072, SKY_ROWS = 48;
+  const skyRT = new THREE.WebGLRenderTarget(SKY_W, SKY_W / 2, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter });
+  const bakeJob = (() => {
+    const bake = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ depthTest: false, depthWrite: false,
+      uniforms: { uC: { value: gC }, uN: { value: gN }, uT: { value: gT }, uA: { value: andro } },
+      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+      fragmentShader: `precision highp float; uniform vec3 uC; uniform vec3 uN; uniform vec3 uT; uniform vec3 uA; varying vec2 vUv;
+        float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,37.719))) * 43758.5453); }
+        float n(vec3 p){ vec3 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(mix(h(i),h(i+vec3(1,0,0)),f.x),mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),mix(mix(h(i+vec3(0,0,1)),h(i+vec3(1,0,1)),f.x),mix(h(i+vec3(0,1,1)),h(i+vec3(1,1,1)),f.x),f.y),f.z); }
+        float fbm(vec3 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 6; i++){ s += n(p) * a; p = p * 2.03 + 17.0; a *= 0.5; } return s; }
+        void main(){
+          /* 與 SphereGeometry 的 uv 對應：u → phi、v → theta */
+          float phi = vUv.x * 6.2831853, th = (1.0 - vUv.y) * 3.1415927;
+          vec3 d = vec3(-cos(phi) * sin(th), cos(th), sin(phi) * sin(th));
+          float lat = asin(clamp(dot(d, uN), -1.0, 1.0));
+          float lon = atan(dot(d, uT), dot(d, uC));
+          float width = 0.05 + 0.08 * exp(-lon * lon / 0.35);                  /* 越接近核心越寬 */
+          float clump = fbm(d * 7.0);
+          float band = exp(-pow(lat / width, 2.0)) * (0.2 + 1.1 * clump * clump);
+          float bulge = exp(-(lat * lat * 40.0 + lon * lon * 7.0));            /* 核心隆起 */
+          float dust = smoothstep(0.42, 0.68, fbm(d * 13.0 + vec3(3.1))) * exp(-pow(lat / (width * 0.45), 2.0));  /* 暗色塵埃帶 */
+          vec3 col = vec3(0.42, 0.5, 0.72) * band * 0.16 + vec3(1.0, 0.78, 0.52) * bulge * 0.32;
+          col *= 1.0 - dust * 0.9;
+          /* 星雲：銀河帶上的發射星雲（紅紫）與反射星雲（青藍） */
+          float neb1 = exp(-(pow(lon - 0.55, 2.0) * 60.0 + pow(lat + 0.03, 2.0) * 300.0)) * fbm(d * 22.0);
+          float neb2 = exp(-(pow(lon + 0.9, 2.0) * 40.0 + pow(lat - 0.06, 2.0) * 250.0)) * fbm(d * 18.0 + 5.0);
+          col += vec3(0.9, 0.25, 0.42) * neb1 * 0.3 + vec3(0.2, 0.55, 0.85) * neb2 * 0.22;
+          /* 仙女座星系：傾斜的橢圓盤＋亮核 */
+          vec3 ax = normalize(cross(uA, vec3(0.3, 1.0, 0.2))); vec3 ay = cross(uA, ax);
+          vec2 g = vec2(dot(d - uA, ax), dot(d - uA, ay)); float ca = cos(0.6), sa = sin(0.6);
+          g = vec2(ca * g.x - sa * g.y, sa * g.x + ca * g.y);
+          float gal = exp(-(g.x * g.x * 900.0 + g.y * g.y * 9000.0)) * step(0.0, dot(d, uA));
+          col += vec3(0.85, 0.82, 1.0) * gal * 0.25 + vec3(1.0, 0.9, 0.75) * exp(-dot(g, g) * 40000.0) * step(0.0, dot(d, uA)) * 0.4;
+          /* 宇宙背景的極淡雲氣 */
+          col += vec3(0.05, 0.06, 0.1) * smoothstep(0.5, 0.8, fbm(d * 3.0 + 9.0)) * 0.2;
+          gl_FragColor = vec4(col, 1.0);
+        }` }));
+    const bs = new THREE.Scene(); bs.add(bake);
+    const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), rowH = Math.ceil(SKY_W / 2 / SKY_ROWS);
+    let row = 0;
+    return { done: () => row >= SKY_ROWS, step(){
+      if (row >= SKY_ROWS) return;
+      skyRT.scissor.set(0, row * rowH, SKY_W, rowH); skyRT.scissorTest = true;   /* render target 用自己的 scissor */
+      renderer.setRenderTarget(skyRT); renderer.render(bs, cam); renderer.setRenderTarget(null);
+      skyRT.scissorTest = false;
+      if (++row >= SKY_ROWS){ bake.geometry.dispose(); bake.material.dispose(); }
+    } };
+  })();
+  galaxy = new THREE.Mesh(new THREE.SphereGeometry(95, 64, 32), new THREE.ShaderMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide,
+    uniforms: { uMap: { value: skyRT.texture }, uAmt: { value: 0 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `precision mediump float; uniform sampler2D uMap; uniform float uAmt; varying vec2 vUv; void main(){ gl_FragColor = vec4(texture2D(uMap, vUv).rgb * uAmt, 1.0); }` }));
+  galaxy.renderOrder = -2; scene.add(galaxy);
+
+  /* 銀河帶上的星：沿盤面高斯分布，越近核心越密 */
+  {
+    const GN = mobile ? 5000 : 11000, gp = new Float32Array(GN * 3), gs = new Float32Array(GN), gcol = new Float32Array(GN * 3);
+    const v = new THREE.Vector3();
+    const gauss = () => { let u = 0, w = 0; while (u === 0) u = Math.random(); while (w === 0) w = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * w); };
+    for (let i = 0; i < GN; i++){
+      const lon = gauss() * (Math.random() < 0.55 ? 0.7 : 2.2), lat = gauss() * (0.05 + 0.1 * Math.exp(-lon * lon / 0.5));
+      v.copy(gC).multiplyScalar(Math.cos(lon) * Math.cos(lat)).addScaledVector(gT, Math.sin(lon) * Math.cos(lat)).addScaledVector(gN, Math.sin(lat)).multiplyScalar(85);
+      gp[i*3] = v.x; gp[i*3+1] = v.y; gp[i*3+2] = v.z; gs[i] = 0.35 + Math.random() * Math.random() * 1.4;
+      const warm = Math.random() < 0.35 + 0.4 * Math.exp(-lon * lon); gcol[i*3] = warm ? 1.0 : 0.75; gcol[i*3+1] = warm ? 0.88 : 0.85; gcol[i*3+2] = warm ? 0.72 : 1.0;
+    }
+    const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.BufferAttribute(gp, 3)); gg.setAttribute('size', new THREE.BufferAttribute(gs, 1)); gg.setAttribute('color', new THREE.BufferAttribute(gcol, 3));
+    galaxyStars = new THREE.Points(gg, new THREE.ShaderMaterial({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+      uniforms: { uPR: { value: DPR }, uA: { value: 0 }, uTime: { value: 0 } },
+      vertexShader: `attribute float size; attribute vec3 color; uniform float uPR; uniform float uA; uniform float uTime; varying float vA; varying vec3 vC;
+        void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv; gl_PointSize = size * uPR * 1.6; vC = color;
+          vA = uA * (0.55 + 0.45 * sin(uTime * 0.8 + position.x * 1.7 + position.z)); }`,
+      fragmentShader: `precision mediump float; varying float vA; varying vec3 vC; void main(){ float d = length(gl_PointCoord - 0.5); float c = smoothstep(0.5, 0.0, d); gl_FragColor = vec4(vC * c * vA, c * vA); }` }));
+    galaxyStars.renderOrder = -1; scene.add(galaxyStars);
+  }
 
   const hdr = new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType });
   composer = new EffectComposer(renderer, hdr); composer.setPixelRatio(DPR); composer.setSize(innerWidth, innerHeight);
@@ -186,7 +294,7 @@ if (webgl){
     curDPR = d;
     renderer.setPixelRatio(d); composer.setPixelRatio(d);
     renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
-    stars.material.uniforms.uPR.value = d;
+    stars.material.uniforms.uPR.value = d; galaxyStars.material.uniforms.uPR.value = d;
   }
   function adapt(rawMs, t){
     if (t < 2.5) { winStart = t; return; }   /* 剛開場還在編譯 shader，不算 */
@@ -228,7 +336,14 @@ if (webgl){
     const skyAmt = 1 - Math.min(1, Math.max(0, (alt - 0.004) / 0.09));
     skyDome.position.copy(camera.position); skyDome.material.uniforms.uUp.value.copy(camera.position).normalize(); skyDome.material.uniforms.uAmt.value = skyAmt; skyDome.material.uniforms.uDip.value = Math.sin(Math.acos(1 / (1 + alt)));
     const cr = camera.position.length();
-    clouds.material.uniforms.uCamR.value = cr; clouds.material.uniforms.uTime.value = t; clouds.material.uniforms.uAmt.value = 1 - Math.min(1, Math.max(0, (alt - 0.2) / 0.6));
+    clouds.material.uniforms.uCamR.value = cr; clouds.material.uniforms.uTime.value = t; clouds.material.uniforms.uAmt.value = 1;  /* 在太空中也看得到雲 */
+    clouds.rotation.y = rotY * 1.15;   /* 雲比地表轉得快一點，看得出在流動 */
+    { /* 銀河：鏡頭離地球越遠越明顯；地面的天空還亮時不顯示 */
+      const k = Math.min(1, Math.max(0, (cr - 3.4) / 5.6)), milky = k * k * (3 - 2 * k) * (1 - skyAmt);
+      if (t > 2.5 && !bakeJob.done()) bakeJob.step();             /* 開場後才分批烘焙銀河貼圖 */
+      galaxy.position.copy(camera.position); galaxy.material.uniforms.uAmt.value = milky; galaxy.visible = skyAmt < 0.98 && bakeJob.done();
+      galaxyStars.position.copy(camera.position); galaxyStars.material.uniforms.uA.value = milky * 0.9; galaxyStars.material.uniforms.uTime.value = t; galaxyStars.visible = galaxy.visible;
+    }
     vigPass.uniforms.uMist.value = Math.max(0, 1 - Math.abs(cr - 1.02) / 0.004);
     vigPass.uniforms.uHaze.value = state.haze.current * (1 - skyAmt);
     vigPass.uniforms.uBurn.value = burn.v; vigPass.uniforms.uShock.value = shock.v; vigPass.uniforms.uAber.value = aber.v; vigPass.uniforms.uTime.value = t;
@@ -276,6 +391,8 @@ if (webgl){
   }
   gsap.to(prog, { p: 1, ease: 'none', scrollTrigger: { trigger: '#manifest', endTrigger: '#talks', start: 'top bottom', end: 'bottom bottom', scrub: true, onUpdate: () => applyProg(prog.p) } });
   ScrollTrigger.create({ trigger: '#about', start: 'top bottom', end: 'bottom bottom', scrub: true, onUpdate: (self) => { state.camZ.target = 9 + self.progress * 1.5; state.camY.target = 0.6 - self.progress * 0.9; state.lookY.target = 0; state.lookX.target = mobile ? 0 : -2.6 * (1 - self.progress) * (camera.aspect / 1.6); } });
+  /* 對接章：鏡頭往後退、往上仰，地球沉到畫面下方，正面迎向銀河核心 */
+  ScrollTrigger.create({ trigger: '#dock', start: 'top bottom', end: 'bottom bottom', scrub: true, onUpdate: (self) => { const p = self.progress, e = p * p * (3 - 2 * p); state.camZ.target = 10.5 + e * 2.5; state.camY.target = -0.3 - e * 0.9; state.lookY.target = e * 4.2; state.lookX.target = mobile ? 0 : -e * 1.6; } });
   if (reduce){ applyProg(0.5); state.haze.target = 0; state.starA.target = 1; state.ground.current = state.ground.target = 0; }
 }
 
