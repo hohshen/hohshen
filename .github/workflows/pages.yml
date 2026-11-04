@@ -138,7 +138,8 @@ jobs:
           print("### Lighthouse\n\n| 項目 | 分數 |\n|---|---|")
           for k, v in m[0]["summary"].items():
               note = "（軟體 GPU，僅供參考）" if k == "performance" else ""
-              print(f"| {k} | {round(v * 100)}{note} |")
+              score = "無法量測" if v is None else round(v * 100)
+              print(f"| {k} | {score}{note} |")
           PY
 
       - name: 上傳 Lighthouse 報告
