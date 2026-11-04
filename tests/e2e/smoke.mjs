@@ -144,7 +144,8 @@ async function run({ tag, width, height, reduce }) {
     const exited = new Promise((r) => chrome.once('exit', r));
     chrome.kill();
     await Promise.race([exited, sleep(5000)]);
-    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+    // Chrome 的子行程可能還在寫入；清不掉不影響測試結果
+    try { fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* 忽略 */ }
   }
 }
 
