@@ -16,7 +16,9 @@ gsap.registerPlugin(ScrollTrigger);
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fine = matchMedia('(pointer: fine)').matches;
 const mobile = matchMedia('(max-width: 720px)').matches;
-const DPR = Math.min(devicePixelRatio, mobile ? 1.5 : 2);
+/* 解析度上限 1.5：Retina 的 2x 要畫 4 倍像素，GPU 吃不消會整頁掉幀；實際值再由 tick 裡的自適應畫質往下調 */
+const DPR = Math.min(devicePixelRatio, 1.5);
+const DPR_MIN = 0.75;
 
 /* ── WebGL 偵測 ── */
 function hasWebGL(){ try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); return !!gl; } catch(e){ return false; } }
@@ -175,9 +177,34 @@ if (webgl){
   const clock = new THREE.Clock();
   document.addEventListener('visibilitychange', () => { if (document.hidden){ running = false; cancelAnimationFrame(rafId); } else if (!running){ running = true; clock.getDelta(); tick(); } });
 
+  /* 自適應畫質：以「每秒慢幀比例」判斷，單一偶發長幀（例如捲動觸發重算）不會誤降。
+     - 一秒內超過 20% 的幀慢於 24 ms（約 40 fps）→ 降 0.25 倍解析度
+     - 從 1.25 倍起跑；連續 5 秒慢幀都低於 5% → 試著升 0.25（最高 1.5）；升級後 3 秒內又被降回來，就把該等級當作這次瀏覽的上限
+     文字是 DOM，不受影響，只有背景的 3D 變柔一點。 */
+  let curDPR = Math.min(DPR, 1.25), ceil = DPR, winStart = 0, frames = 0, slow = 0, goodSecs = 0, lastUp = -99;
+  function setDPR(d){
+    curDPR = d;
+    renderer.setPixelRatio(d); composer.setPixelRatio(d);
+    renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
+    stars.material.uniforms.uPR.value = d;
+  }
+  function adapt(rawMs, t){
+    if (t < 2.5) { winStart = t; return; }   /* 剛開場還在編譯 shader，不算 */
+    frames++; if (rawMs > 24) slow++;
+    if (t - winStart < 1) return;
+    const ratio = slow / frames; frames = 0; slow = 0; winStart = t;
+    if (ratio > 0.2 && curDPR > DPR_MIN){
+      if (t - lastUp < 3) ceil = curDPR - 0.25;  /* 剛升上來就撐不住：這一級不再嘗試 */
+      setDPR(Math.max(DPR_MIN, curDPR - 0.25)); goodSecs = 0;
+    } else if (ratio < 0.05){
+      if (++goodSecs >= 5 && curDPR < ceil){ setDPR(Math.min(ceil, curDPR + 0.25)); lastUp = t; goodSecs = 0; }
+    } else goodSecs = 0;
+  }
+
   function tick(){
     if (!running) return;
-    const dt = Math.min(clock.getDelta(), 0.1), t = clock.elapsedTime;
+    const raw = clock.getDelta(), dt = Math.min(raw, 0.1), t = clock.elapsedTime;
+    adapt(raw * 1000, t);
     for (const k in state) damp(state[k], dt);
     /* 起點：地表上方 0.004、緯度 0.6 rad；終點：原本的軌道視角。高度用指數爬升，像真的火箭 */
     const u = state.ground.current;
@@ -221,8 +248,10 @@ if (webgl){
     composer.render();
     rafId = requestAnimationFrame(tick);
   }
+  setDPR(curDPR);
   renderer.compile(scene, camera);
   tick();
+  window.__quality = () => ({ dpr: curDPR, ceil });
   window.__scene = { state, camera, burn, shock, aber, fovP, shake, gsap, clouds, composer, planetMat };
 }
 
@@ -313,9 +342,12 @@ if (!mobile && !reduce){
 /* 游標與磁吸 */
 if (fine && !reduce){
   document.body.classList.add('has-cursor');
-  const cur = document.getElementById('cursor'); const c = { x: innerWidth / 2, y: innerHeight / 2, tx: innerWidth / 2, ty: innerHeight / 2 };
-  addEventListener('mousemove', (e) => { c.tx = e.clientX; c.ty = e.clientY; }, { passive: true });
-  gsap.ticker.add(() => { c.x += (c.tx - c.x) * 0.18; c.y += (c.ty - c.y) * 0.18; cur.style.transform = `translate3d(${c.x}px,${c.y}px,0)`; });
+  /* 小點在 pointermove 當下就定位，不等下一幀，畫面再忙也跟手；外圈用與幀率無關的緩動追上。
+     用 CSS 的 translate 屬性移動，不佔 transform，外圈 hover 放大的 scale 不受影響。 */
+  const cur = document.getElementById('cursor'), dot = cur.querySelector('.dot'), ringEl = cur.querySelector('.ring');
+  const c = { x: innerWidth / 2, y: innerHeight / 2, tx: innerWidth / 2, ty: innerHeight / 2 };
+  addEventListener('pointermove', (e) => { c.tx = e.clientX; c.ty = e.clientY; dot.style.translate = `${c.tx}px ${c.ty}px`; }, { passive: true });
+  gsap.ticker.add((time, deltaMs) => { const f = 1 - Math.pow(1 - 0.25, Math.min(deltaMs, 100) / 16.7); c.x += (c.tx - c.x) * f; c.y += (c.ty - c.y) * f; ringEl.style.translate = `${c.x}px ${c.y}px`; });
   document.querySelectorAll('a, button, summary').forEach(el => { el.addEventListener('mouseenter', () => cur.classList.add('on')); el.addEventListener('mouseleave', () => cur.classList.remove('on')); });
   document.querySelectorAll('.magnet').forEach(b => { b.addEventListener('mousemove', (e) => { const r = b.getBoundingClientRect(); gsap.to(b, { x: (e.clientX - r.left - r.width / 2) * 0.22, y: (e.clientY - r.top - r.height / 2) * 0.22, duration: 0.5, ease: 'power3.out' }); }); b.addEventListener('mouseleave', () => gsap.to(b, { x: 0, y: 0, duration: 0.6, ease: 'power3.out' })); });
 }

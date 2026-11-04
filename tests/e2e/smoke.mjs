@@ -25,7 +25,7 @@ const HARD = {
   introMs: 60000, // body.intro-done 出現的上限（CI 軟體 GPU 初始化 3D 很慢）
 };
 const SOFT = {
-  warpGoneMs: 3500, // 開場 canvas 淡出完成；主執行緒被 3D 初始化卡住時會超過，只警告
+  warpGoneMs: 2500, // 開場 canvas 淡出完成；主執行緒被 3D 初始化卡住時會超過，只警告
 };
 
 const errors = [];

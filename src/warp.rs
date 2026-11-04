@@ -1,8 +1,8 @@
 //! 開場：深空躍遷回發射台（2D canvas）。
 //!
 //! 0–0.35 秒點狀星漂移 → 0.35–1.1 秒加速拉成光束 → 場景就緒後中心閃光 → 淡出。
-//! 場景最多等到 2.3 秒；閃光 0.22 秒＋淡出 0.45 秒，整段 3 秒內結束。
-//! index.html 的 CSS 另有保險：主執行緒被卡住時，合成器仍會在 3 秒內把 canvas 淡掉。
+//! 場景最多等到 1.3 秒；閃光 0.22 秒＋淡出 0.45 秒，整段 2 秒內結束。
+//! index.html 的 CSS 另有保險：主執行緒被卡住時，合成器仍會在 2 秒內把 canvas 淡掉。
 //! 點擊、滾輪、觸控、按鍵都會立刻略過；reduced motion 不播。
 
 use std::cell::{Cell, RefCell};
@@ -13,7 +13,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-const WAIT_MAX: f64 = 2.3;
+const WAIT_MAX: f64 = 1.3;
 const FLASH: f64 = 0.22;
 const FADE_MS: i32 = 460;
 
