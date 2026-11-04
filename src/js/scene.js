@@ -27,6 +27,7 @@ if (!webgl) document.body.classList.add('no-webgl');
 
 /* ── 場景 ── */
 let composer, renderer, camera, scene, planet, atmo, ring, sat, stars, grainPass, planetMat, skyDome, clouds, galaxy, galaxyStars, running = true, rafId = 0;
+let solar, solarBodies, solarOnOrbit, orbitLines, belt, earthDot, sunPos, sysCam, sysLook;
 const state = {
   camY:   { current: 0.15, target: 0.15, ease: 0.06 },
   camZ:   { current: mobile ? 4.2 : 3.4,  target: mobile ? 4.2 : 3.4,  ease: 0.06 },
@@ -39,6 +40,7 @@ const state = {
   starA:  { current: 0.25, target: 0.25, ease: 0.07 },
   atmoI:  { current: 1.35, target: 1.35, ease: 0.05 },
   ground: { current: 1, target: 1, ease: 0.06 },
+  zoom:   { current: 0, target: 0, ease: 0.05 },   /* 0 = 地球附近；1 = 拉遠到整個太陽系 */
 };
 const shake = { a: 0 };
 let rotY = 0;
@@ -178,17 +180,17 @@ if (webgl){
           vec3 d = vec3(-cos(phi) * sin(th), cos(th), sin(phi) * sin(th));
           float lat = asin(clamp(dot(d, uN), -1.0, 1.0));
           float lon = atan(dot(d, uT), dot(d, uC));
-          float width = 0.05 + 0.08 * exp(-lon * lon / 0.35);                  /* 越接近核心越寬 */
+          float width = 0.04 + 0.06 * exp(-lon * lon / 0.2);                   /* 越接近核心越寬 */
           float clump = fbm(d * 7.0);
           float band = exp(-pow(lat / width, 2.0)) * (0.2 + 1.1 * clump * clump);
-          float bulge = exp(-(lat * lat * 40.0 + lon * lon * 7.0));            /* 核心隆起 */
+          float bulge = exp(-(lat * lat * 110.0 + lon * lon * 22.0));          /* 核心隆起：亮但集中 */
           float dust = smoothstep(0.42, 0.68, fbm(d * 13.0 + vec3(3.1))) * exp(-pow(lat / (width * 0.45), 2.0));  /* 暗色塵埃帶 */
-          vec3 col = vec3(0.42, 0.5, 0.72) * band * 0.16 + vec3(1.0, 0.78, 0.52) * bulge * 0.32;
+          vec3 col = vec3(0.42, 0.5, 0.72) * band * 0.2 + vec3(1.0, 0.8, 0.56) * bulge * 0.55;
           col *= 1.0 - dust * 0.9;
           /* 星雲：銀河帶上的發射星雲（紅紫）與反射星雲（青藍） */
           float neb1 = exp(-(pow(lon - 0.55, 2.0) * 60.0 + pow(lat + 0.03, 2.0) * 300.0)) * fbm(d * 22.0);
           float neb2 = exp(-(pow(lon + 0.9, 2.0) * 40.0 + pow(lat - 0.06, 2.0) * 250.0)) * fbm(d * 18.0 + 5.0);
-          col += vec3(0.9, 0.25, 0.42) * neb1 * 0.3 + vec3(0.2, 0.55, 0.85) * neb2 * 0.22;
+          col += vec3(0.9, 0.25, 0.42) * neb1 * 0.42 + vec3(0.2, 0.55, 0.85) * neb2 * 0.3;
           /* 仙女座星系：傾斜的橢圓盤＋亮核 */
           vec3 ax = normalize(cross(uA, vec3(0.3, 1.0, 0.2))); vec3 ay = cross(uA, ax);
           vec2 g = vec2(dot(d - uA, ax), dot(d - uA, ay)); float ca = cos(0.6), sa = sin(0.6);
@@ -235,6 +237,79 @@ if (webgl){
           vA = uA * (0.55 + 0.45 * sin(uTime * 0.8 + position.x * 1.7 + position.z)); }`,
       fragmentShader: `precision mediump float; varying float vA; varying vec3 vC; void main(){ float d = length(gl_PointCoord - 0.5); float c = smoothstep(0.5, 0.0, d); gl_FragColor = vec4(vC * c * vA, c * vA); }` }));
     galaxyStars.renderOrder = -1; scene.add(galaxyStars);
+  }
+
+  /* 太陽系：最後一章鏡頭拉遠時才出現。比例刻意誇大（真實比例下行星小到看不見）。
+     太陽放在原本平行光的方向，地球（原點）在第三條軌道上；鏡頭最後停在太陽系斜下方，
+     視線穿過太陽正對銀河核心，所以銀河在太陽系正後方。 */
+  const SUN_D = 55;
+  sunPos = sunDir.clone().multiplyScalar(SUN_D);
+  const ecl = new THREE.Vector3(0, 1, 0).addScaledVector(sunDir, -sunDir.y).normalize();   /* 黃道面法線 */
+  const e1 = sunDir.clone().negate(), e2 = new THREE.Vector3().crossVectors(ecl, e1).normalize();
+  const onOrbit = (r, ang, out) => out.copy(sunPos).addScaledVector(e1, Math.cos(ang) * r).addScaledVector(e2, Math.sin(ang) * r);
+  /* 視線稍微偏開銀河核心，讓核心落在畫面一側、太陽在中間 */
+  sysCam = sunPos.clone().addScaledVector(gC.clone().addScaledVector(e2, 0.55).addScaledVector(ecl, -0.15).normalize(), -720);
+  sysLook = sunPos.clone();
+  solar = new THREE.Group(); solar.visible = false; scene.add(solar);
+  const NOISE = `float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,37.719))) * 43758.5453); }
+      float n(vec3 p){ vec3 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(mix(h(i),h(i+vec3(1,0,0)),f.x),mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),mix(mix(h(i+vec3(0,0,1)),h(i+vec3(1,0,1)),f.x),mix(h(i+vec3(0,1,1)),h(i+vec3(1,1,1)),f.x),f.y),f.z); }`;
+  /* 太陽：會翻騰的表面＋邊緣變暗，HDR 亮度交給 bloom 做出光暈 */
+  const sunMat = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 } },
+    vertexShader: `varying vec3 vN; varying vec3 vP; void main(){ vN = normalize(normalMatrix * normal); vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `precision highp float; uniform float uTime; varying vec3 vN; varying vec3 vP; ${NOISE}
+      void main(){ float g = n(vP * 1.4 + uTime * 0.12) * 0.6 + n(vP * 3.6 - uTime * 0.18) * 0.4; float limb = pow(max(normalize(vN).z, 0.0), 0.45);
+        gl_FragColor = vec4(mix(vec3(2.6, 1.0, 0.28), vec3(4.2, 2.9, 1.4), g) * (0.5 + 0.5 * limb), 1.0); }` });
+  solar.add(new THREE.Mesh(new THREE.SphereGeometry(7, 48, 32), sunMat).translateX(sunPos.x).translateY(sunPos.y).translateZ(sunPos.z));
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+    const gr = g.createRadialGradient(128, 128, 0, 128, 128, 128); gr.addColorStop(0, 'rgba(255,220,170,1)'); gr.addColorStop(0.15, 'rgba(255,170,90,0.55)'); gr.addColorStop(0.45, 'rgba(255,120,60,0.12)'); gr.addColorStop(1, 'rgba(255,100,40,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+    glow.scale.setScalar(110); glow.position.copy(sunPos); solar.add(glow);
+  }
+  /* 行星：受太陽方向照亮；木星、土星有雲帶 */
+  const planetShader = (c1, c2, band) => new THREE.ShaderMaterial({ uniforms: { uSun: { value: sunPos }, uC1: { value: new THREE.Color(...c1) }, uC2: { value: new THREE.Color(...c2) }, uBand: { value: band } },
+    vertexShader: `varying vec3 vN; varying vec3 vW; varying vec3 vP; void main(){ vN = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vP = position; gl_Position = projectionMatrix * viewMatrix * w; }`,
+    fragmentShader: `precision highp float; uniform vec3 uSun; uniform vec3 uC1; uniform vec3 uC2; uniform float uBand; varying vec3 vN; varying vec3 vW; varying vec3 vP;
+      void main(){ float d = max(dot(normalize(vN), normalize(uSun - vW)), 0.0); float y = normalize(vP).y;
+        vec3 base = mix(uC1, mix(uC1, uC2, 0.5 + 0.5 * sin(y * 26.0 + sin(y * 7.0) * 1.6)), uBand);
+        gl_FragColor = vec4(base * (0.05 + 1.25 * d), 1.0); }` });
+  const PLANETS = [ /* 軌道半徑, 大小, 顏色, 雲帶顏色, 雲帶, 起始角度 */
+    [22, 1.0, [0.62, 0.6, 0.57], [0, 0, 0], 0, 1.2],      /* 水星 */
+    [37, 1.6, [0.95, 0.83, 0.58], [0, 0, 0], 0, 2.7],     /* 金星 */
+    [78, 1.2, [0.86, 0.4, 0.24], [0, 0, 0], 0, 0.55],     /* 火星 */
+    [128, 6.5, [0.86, 0.74, 0.58], [0.6, 0.43, 0.3], 1, 3.7],   /* 木星 */
+    [178, 5.4, [0.93, 0.85, 0.62], [0.74, 0.64, 0.44], 1, 5.1], /* 土星 */
+    [226, 3.2, [0.62, 0.86, 0.9], [0, 0, 0], 0, 2.1],     /* 天王星 */
+    [270, 3.0, [0.32, 0.47, 0.96], [0, 0, 0], 0, 4.4],    /* 海王星 */
+  ];
+  solarBodies = PLANETS.map(([r, size, c1, c2, band, a0]) => {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(size, 32, 24), planetShader(c1, c2, band)); solar.add(m);
+    if (r === 178){ const ringM = new THREE.Mesh(new THREE.RingGeometry(size * 1.35, size * 2.3, 96), new THREE.MeshBasicMaterial({ color: 0xd9c49a, transparent: true, opacity: 0.55, side: THREE.DoubleSide, depthWrite: false }));
+      ringM.lookAt(ecl); ringM.rotateX(0.45); m.add(ringM); }
+    return { m, r, a0, w: 0.05 * Math.pow(SUN_D / r, 1.5) };
+  });
+  solarOnOrbit = onOrbit;
+  /* 公轉軌道：地球那條亮一點 */
+  orbitLines = [22, 37, SUN_D, 78, 128, 178, 226, 270].map((r) => {
+    const pts = []; const v = new THREE.Vector3(); for (let i = 0; i <= 256; i++){ onOrbit(r, (i / 256) * Math.PI * 2, v); pts.push(v.clone()); }
+    const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: r === SUN_D ? 0x7fc4ff : 0x9fb4cc, transparent: true, opacity: 0, depthWrite: false }));
+    l.userData.max = r === SUN_D ? 0.85 : 0.38; solar.add(l); return l;
+  });
+  /* 小行星帶 */
+  {
+    const N = mobile ? 1500 : 3500, pos = new Float32Array(N * 3), v = new THREE.Vector3();
+    for (let i = 0; i < N; i++){ onOrbit(96 + Math.random() * 18, Math.random() * Math.PI * 2, v); v.addScaledVector(ecl, (Math.random() - 0.5) * 3); pos.set([v.x, v.y, v.z], i * 3); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    belt = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xb8ab98, size: 1.8, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false })); solar.add(belt);
+  }
+  /* 「你在這裡」：拉遠後地球只剩一個亮藍點 */
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+    const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(220,240,255,1)'); gr.addColorStop(0.3, 'rgba(127,196,255,0.9)'); gr.addColorStop(1, 'rgba(127,196,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+    earthDot = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), sizeAttenuation: false, depthTest: false, depthWrite: false, transparent: true, opacity: 0 }));
+    earthDot.scale.setScalar(0.022); scene.add(earthDot);
   }
 
   const hdr = new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType });
@@ -329,10 +404,17 @@ if (webgl){
       const lb = g < 0.3 ? 0 : Math.min(1, (g - 0.3) / 0.7), l2 = lb * lb * (3 - 2 * lb);
       lx = gx + (lx - gx) * l2; ly = gy + (ly - gy) * l2; lz = gz + (0 - gz) * l2;
     } else { px = 0; py = by; pz = bz; }
-    const low = Math.min(1, alt * 12);
+    /* 拉遠到太陽系：位置先慢後快，視線從地球逐漸轉向太陽 */
+    const zt = state.zoom.current, ze = zt * zt * (3 - 2 * zt), zp = Math.pow(ze, 1.7);
+    if (ze > 0.0005){
+      px += (sysCam.x - px) * zp; py += (sysCam.y - py) * zp; pz += (sysCam.z - pz) * zp;
+      lx += (sysLook.x - lx) * zp; ly += (sysLook.y - ly) * zp; lz += (sysLook.z - lz) * zp;
+    }
+    const low = Math.min(1, alt * 12) * (1 - ze);
     const sh = (shake.a + burn.v * burn.v * 0.7 + Math.sin(t * 23.0) * burn.v * 0.15) * 0.035 * low;
     camera.position.set(px + state.mouseX.current * 0.12 * low + (Math.random() - 0.5) * sh, py + state.mouseY.current * 0.06 * low + (Math.random() - 0.5) * sh, pz);
-    const nr = Math.min(0.05, Math.max(0.0008, alt * 0.2)); if (Math.abs(camera.near - nr) > 1e-5){ camera.near = nr; camera.updateProjectionMatrix(); }
+    const nr = Math.min(0.05, Math.max(0.0008, alt * 0.2)) + zp * 2, fr = 200 + zp * 2800;
+    if (Math.abs(camera.near - nr) > 1e-5 || Math.abs(camera.far - fr) > 0.5){ camera.near = nr; camera.far = fr; camera.updateProjectionMatrix(); }
     const skyAmt = 1 - Math.min(1, Math.max(0, (alt - 0.004) / 0.09));
     skyDome.position.copy(camera.position); skyDome.material.uniforms.uUp.value.copy(camera.position).normalize(); skyDome.material.uniforms.uAmt.value = skyAmt; skyDome.material.uniforms.uDip.value = Math.sin(Math.acos(1 / (1 + alt)));
     const cr = camera.position.length();
@@ -341,8 +423,8 @@ if (webgl){
     { /* 銀河：鏡頭離地球越遠越明顯；地面的天空還亮時不顯示 */
       const k = Math.min(1, Math.max(0, (cr - 3.4) / 5.6)), milky = k * k * (3 - 2 * k) * (1 - skyAmt);
       if (t > 2.5 && !bakeJob.done()) bakeJob.step();             /* 開場後才分批烘焙銀河貼圖 */
-      galaxy.position.copy(camera.position); galaxy.material.uniforms.uAmt.value = milky; galaxy.visible = skyAmt < 0.98 && bakeJob.done();
-      galaxyStars.position.copy(camera.position); galaxyStars.material.uniforms.uA.value = milky * 0.9; galaxyStars.material.uniforms.uTime.value = t; galaxyStars.visible = galaxy.visible;
+      galaxy.position.copy(camera.position); galaxy.material.uniforms.uAmt.value = milky * (1 + 0.2 * ze); galaxy.visible = skyAmt < 0.98 && bakeJob.done();
+      galaxyStars.position.copy(camera.position); galaxyStars.material.uniforms.uA.value = milky * (1 + 0.3 * ze); galaxyStars.material.uniforms.uTime.value = t; galaxyStars.visible = galaxy.visible;
     }
     vigPass.uniforms.uMist.value = Math.max(0, 1 - Math.abs(cr - 1.02) / 0.004);
     vigPass.uniforms.uHaze.value = state.haze.current * (1 - skyAmt);
@@ -354,7 +436,15 @@ if (webgl){
     camera.lookAt(lx, ly, lz);
     rotY += dt * 0.02 * (1 - u); planet.rotation.y = rotY; fill.intensity = 0.35 * Math.pow(1 - u, 4); scene.environmentIntensity = Math.pow(1 - u, 6);
     if (planetMat.userData.sh) planetMat.userData.sh.uniforms.uNear.value = Math.max(0, 1 - alt / 0.05); atmo.rotation.copy(planet.rotation);
-    stars.rotation.y = t * 0.004; stars.material.uniforms.uTime.value = t;
+    stars.rotation.y = t * 0.004; stars.material.uniforms.uTime.value = t; stars.position.copy(camera.position);   /* 星空跟著鏡頭，拉遠時不會變成一團 */
+    solar.visible = ze > 0.002;
+    if (solar.visible){
+      sunMat.uniforms.uTime.value = t;
+      for (const b of solarBodies) solarOnOrbit(b.r, b.a0 + t * b.w, b.m.position);
+      for (const l of orbitLines) l.material.opacity = l.userData.max * ze;
+      belt.material.opacity = 0.8 * ze;
+    }
+    earthDot.material.opacity = Math.max(0, (ze - 0.35) / 0.65); earthDot.visible = earthDot.material.opacity > 0.01;
     const a = state.ringA.current + t * 0.12, rr = 1.62;
     sat.position.set(Math.cos(a) * rr, 0, Math.sin(a) * rr).applyEuler(ring.rotation);
     sat.visible = u < 0.12; ring.material.opacity = 0.16 * Math.max(0, 1 - u * 1.3);
@@ -391,8 +481,8 @@ if (webgl){
   }
   gsap.to(prog, { p: 1, ease: 'none', scrollTrigger: { trigger: '#manifest', endTrigger: '#talks', start: 'top bottom', end: 'bottom bottom', scrub: true, onUpdate: () => applyProg(prog.p) } });
   ScrollTrigger.create({ trigger: '#about', start: 'top bottom', end: 'bottom bottom', scrub: true, onUpdate: (self) => { state.camZ.target = 9 + self.progress * 1.5; state.camY.target = 0.6 - self.progress * 0.9; state.lookY.target = 0; state.lookX.target = mobile ? 0 : -2.6 * (1 - self.progress) * (camera.aspect / 1.6); } });
-  /* 對接章：鏡頭往後退、往上仰，地球沉到畫面下方，正面迎向銀河核心 */
-  ScrollTrigger.create({ trigger: '#dock', start: 'top bottom', end: 'bottom bottom', scrub: true, onUpdate: (self) => { const p = self.progress, e = p * p * (3 - 2 * p); state.camZ.target = 10.5 + e * 2.5; state.camY.target = -0.3 - e * 0.9; state.lookY.target = e * 4.2; state.lookX.target = mobile ? 0 : -e * 1.6; } });
+  /* 對接章到頁尾：鏡頭一路拉遠，看見整個太陽系與後方的銀河 */
+  ScrollTrigger.create({ trigger: '#dock', start: 'top 55%', endTrigger: 'footer', end: 'bottom bottom', scrub: true, onUpdate: (self) => { state.zoom.target = self.progress; } });
   if (reduce){ applyProg(0.5); state.haze.target = 0; state.starA.target = 1; state.ground.current = state.ground.target = 0; }
 }
 
