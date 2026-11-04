@@ -58,10 +58,6 @@ fn arrow() -> impl IntoView {
 }
 
 /// 章節標題左上的高度標記，例如「0 km 發射台」
-fn alt(km: &'static str, name: &'static str) -> impl IntoView {
-    view! { <p class="alt"><b>{km}</b>{name}</p> }
-}
-
 #[component]
 fn Nav(menu_open: RwSignal<bool>, current: RwSignal<String>) -> impl IntoView {
     view! {
@@ -126,7 +122,7 @@ fn RecordSection() -> impl IntoView {
     view! {
         <section class="record" id="record" data-km="0" data-name="發射台">
             <div class="sec-head">
-                <div>{alt("0 km", "發射台")}<h2 class="display zh h-sec"><span class="mask"><span>"實戰紀錄，附出處"</span></span></h2></div>
+                <div><h2 class="display zh h-sec"><span class="mask"><span>"實戰紀錄，附出處"</span></span></h2></div>
                 <p class="lead">"我寫的每一篇、講的每一場，素材都從這裡起飛。數字只抄不算；出處兩態：媒體報導附公開連結、內部資料面談可說明。"</p>
             </div>
             <div class="rec">
@@ -150,7 +146,7 @@ fn How() -> impl IntoView {
     view! {
         <section class="how" id="how" data-km="50" data-name="平流層頂">
             <div class="sec-head">
-                <div>{alt("50 km", "平流層頂")}<h2 class="display zh h-sec"><span class="mask"><span>"每一篇怎麼來的"</span></span></h2></div>
+                <div><h2 class="display zh h-sec"><span class="mask"><span>"每一篇怎麼來的"</span></span></h2></div>
                 <p class="lead">"沒上線過的不講。三步，缺一步就不發。"</p>
             </div>
             <div class="steps">
@@ -168,7 +164,7 @@ fn Decisions() -> impl IntoView {
     view! {
         <section class="decisions" id="decisions" data-km="100" data-name="卡門線">
             <div class="sec-head">
-                <div>{alt("100 km", "卡門線")}<h2 class="display zh h-sec"><span class="mask"><span>"取捨紀錄"</span></span></h2></div>
+                <div><h2 class="display zh h-sec"><span class="mask"><span>"取捨紀錄"</span></span></h2></div>
                 <p class="lead">"卡門線是大氣層與太空的分界。AI 專案能不能離開概念驗證，差別不在技術，在這幾個取捨有沒有寫成制度。這也是我每篇文章的骨架。"</p>
             </div>
             <div class="track" id="track">
@@ -194,7 +190,7 @@ fn Writing() -> impl IntoView {
     view! {
         <section class="writing" id="writing" data-km="400" data-name="低地軌道">
             <div class="sec-head">
-                <div>{alt("400 km", "低地軌道")}<h2 class="display zh h-sec"><span class="mask"><span>"四條寫作線"</span></span></h2></div>
+                <div><h2 class="display zh h-sec"><span class="mask"><span>"四條寫作線"</span></span></h2></div>
                 <p class="lead">"入軌之後就是持續運行。每條線各回答一個問題，你拿到的是方法與帳本，不是結論。篇數與狀態如實標示。"</p>
             </div>
             <ul class="lines">
@@ -219,7 +215,7 @@ fn Talks() -> impl IntoView {
     view! {
         <section class="talks" id="talks" data-km="36000" data-name="同步軌道">
             <div class="sec-head">
-                <div>{alt("36,000 km", "同步軌道")}<h2 class="display zh h-sec"><span class="mask"><span>"演講"</span></span></h2></div>
+                <div><h2 class="display zh h-sec"><span class="mask"><span>"演講"</span></span></h2></div>
                 <p class="lead">"同步軌道上的衛星負責廣播。公司裡驗證過的做法，透過演講往外送；2024 至 2026 共 12 場，COSCUP 連續三年，JSDC 與 MOPCON 付費講師。"</p>
             </div>
             <div class="plates">
@@ -249,7 +245,6 @@ fn About() -> impl IntoView {
             <div class="bio">
                 <img src="img/portrait.jpg" alt="後端里長伯的大頭照" width="516" height="766"/>
                 <div>
-                    {alt("地面站", "通訊")}
                     <h2 class="display zh" style="font-size:clamp(1.8rem,3vw,2.8rem);margin-bottom:18px">"關於我"</h2>
                     <p>"何勝，網路上叫後端里長伯。製造業的企業架構師，負責企業系統與 AI 導入的架構決策與交付制度。"</p>
                     <p class="small">"之前做過資安產品的特權存取管理平台，更早在系統整合公司帶 5 至 8 人團隊，設計過支撐近 10 萬盞設備的智慧路燈平台。三個產業共通的是高併發資料與跨部門交付。主力是 TypeScript、PostgreSQL、Kubernetes 與 LLM 周邊。國立臺北大學資訊工程學系。"</p>
@@ -268,7 +263,6 @@ fn About() -> impl IntoView {
 fn Dock() -> impl IntoView {
     view! {
         <section class="dock" id="dock">
-            {alt("對接", "Docking")}
             <h2 class="display zh" style="font-size:clamp(2.2rem,6vw,6rem)"><span class="mask"><span>"有一場演講、一個題目，想一起把它寫成制度？"</span></span></h2>
             <div class="row">
                 <p>"寄信時寫一句場合與題目方向就好。我會在兩個工作日內回覆。"</p>

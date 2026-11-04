@@ -72,19 +72,18 @@ body.intro-done .nav{opacity:1;transform:none}
    Lighthouse 看不到 3D 背景，真實對比由 tests/e2e/contrast.mjs 實測（WCAG AA）。 */
 main,footer{text-shadow:0 0 1px rgba(6,8,15,.95),0 0 6px rgba(6,8,15,.9),0 0 16px rgba(6,8,15,.8),0 0 32px rgba(6,8,15,.6)}
 .btn,.plates figcaption{text-shadow:none}
-.hero .kick,.hero .lead,.sec-head .lead,.sec-head>div,.rec .r,.step,.alt,.lines li,.tbl .tr,.about .bio>div,.faq details,.dock h2,.dock p,footer .l,footer .r{position:relative;isolation:isolate}
-.hero .kick::before,.hero .lead::before,.sec-head .lead::before,.sec-head>div::before,.rec .r::before,.step::before,.alt::before,.lines li::before,.tbl .tr::before,.about .bio>div::before,.faq details::before,.dock h2::before,.dock p::before,footer .l::before,footer .r::before{
+.hero .kick,.hero .lead,.sec-head .lead,.sec-head>div,.rec .r,.step,.lines li,.tbl .tr,.about .bio>div,.faq details,.dock h2,.dock p,footer .l,footer .r{position:relative;isolation:isolate}
+.hero .kick::before,.hero .lead::before,.sec-head .lead::before,.sec-head>div::before,.rec .r::before,.step::before,.lines li::before,.tbl .tr::before,.about .bio>div::before,.faq details::before,.dock h2::before,.dock p::before,footer .l::before,footer .r::before{
   content:"";position:absolute;inset:-56px -88px;z-index:-1;pointer-events:none;
   background:radial-gradient(closest-side,rgba(6,8,15,.92) 0%,rgba(6,8,15,.88) 45%,rgba(6,8,15,.55) 70%,rgba(6,8,15,.2) 86%,rgba(6,8,15,0))}
+/* 步驟卡落在大氣光霧最亮的高度：遮罩的實心範圍放大，邊緣的字也蓋得到 */
+.step::before{background:radial-gradient(closest-side,rgba(6,8,15,.94) 0%,rgba(6,8,15,.9) 62%,rgba(6,8,15,.55) 82%,rgba(6,8,15,0))}
 /* 很寬的列（數字、寫作線、演講表）：遮罩改成扁而寬，左右兩端也遮得到 */
 .rec .r::before,.lines li::before,.tbl .tr::before{inset:-28px -64px;background:radial-gradient(ellipse 64% 92% at 50% 50%,rgba(6,8,15,.92) 0%,rgba(6,8,15,.88) 62%,rgba(6,8,15,.5) 84%,rgba(6,8,15,0) 100%)}
 
 /* 共用節 */
 section{position:relative}
 .sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:end;margin-bottom:clamp(40px,6vw,96px)}
-.alt{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;color:var(--ice-2);font-size:.9rem}
-.alt b{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--atmo);font-variant-numeric:tabular-nums}
-.alt::before{content:"";width:28px;height:1px;background:var(--atmo);align-self:center}
 .btn{display:inline-flex;align-items:center;gap:12px;padding:16px 26px;border-radius:999px;background:var(--ice);color:var(--void);font-weight:600;font-size:1rem;transition:background-color .3s var(--ease-out),color .3s var(--ease-out)}
 .btn:hover{background:var(--atmo)}
 .btn .arrow{width:18px;height:18px;transition:transform .4s var(--ease-out)}
