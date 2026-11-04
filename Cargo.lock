@@ -508,6 +508,7 @@ dependencies = [
  "console_error_panic_hook",
  "js-sys",
  "leptos",
+ "regex",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",

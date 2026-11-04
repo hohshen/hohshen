@@ -1,0 +1,17 @@
+# 每週檢查 Rust 依賴與 GitHub Actions 的新版本，自動開 PR；PR 會跑完整檢查但不發佈。
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      rust:
+        patterns: ["*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
