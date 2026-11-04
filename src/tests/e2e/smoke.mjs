@@ -80,7 +80,7 @@ async function run({ tag, width, height, reduce }) {
   const port = 9300 + Math.floor(Math.random() * 600);
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'smoke-'));
   const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, `--window-size=${width},${height}`,
-    '--no-first-run', '--no-default-browser-check', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', ...(process.env.CI ? ['--no-sandbox'] : []), 'about:blank'], { stdio: 'ignore' });
+    '--no-first-run', '--no-default-browser-check', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--hide-scrollbars', ...(process.env.CI ? ['--no-sandbox'] : []), 'about:blank'], { stdio: 'ignore' });
   try {
     let target;
     for (let i = 0; i < 80 && !target; i++) {

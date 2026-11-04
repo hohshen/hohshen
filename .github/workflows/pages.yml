@@ -129,6 +129,10 @@ jobs:
       - name: E2E 冒煙測試＋效能預算
         run: node tests/e2e/smoke.mjs
 
+      # Lighthouse 只看 CSS 背景（純黑），看不到 3D 的地球、雲、銀河、太陽；這一步量畫面上的真實背景
+      - name: 真實背景的文字對比（WCAG AA）
+        run: node tests/e2e/contrast.mjs
+
       # 無障礙（內含 axe-core）、最佳實務、SEO 必須滿分；效能在軟體 GPU 上不準，只列報告
       - name: Lighthouse（無障礙、最佳實務、SEO 滿分）
         env:

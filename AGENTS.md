@@ -31,6 +31,7 @@
 - 改了 `src/rust/` 之後要跑 `src/build.sh`，讓 `src/index.html` 的預渲染內容更新，再一起 commit。
 - 改了 `src/vendor/` 或 `src/js/` 要跑 `src/scripts/vendor-sums.sh` 更新雜湊。
 - 開新分頁的連結要有 `rel="noopener"`；圖片要有 `alt`、`width`、`height`。
+- 文字疊在 3D 背景上要讀得清楚：調亮銀河、太陽、雲之後要跑 `src/tests/e2e/contrast.mjs`。Lighthouse 只看 CSS 背景色，量不到 3D。
 - 禁用詞：公開清單在 `src/tests/forbidden-public.txt`。不公開清單（真名等）只放在 GitHub secret `FORBIDDEN_TERMS` 與本機被 ignore 的 `docs/forbidden.txt`，**不要寫進任何會 commit 的檔案，也不要在 log、issue、PR 裡寫出來**。
 - `docs/` 被 gitignore：裡面的 PRD 有不公開的個資，不要加進版控。
 
@@ -43,6 +44,7 @@
 ./build.sh                                        # 預渲染 → trunk build → dist/
 cargo test --features ssr --test site_rules       # 結構測試與內容規則
 node tests/e2e/smoke.mjs                          # E2E 冒煙測試＋效能預算（需要 Chrome）
+node tests/e2e/contrast.mjs                       # 文字疊在 3D 背景上的真實對比（Lighthouse 看不到 3D）
 SMOKE_URL=https://hohshen.github.io/hohshen/ node tests/e2e/smoke.mjs   # 測線上網站
 npx @lhci/cli@0.15.1 autorun                      # Lighthouse（先 ./build.sh）
 cargo deny check advisories bans sources          # 依賴漏洞
@@ -57,7 +59,7 @@ cargo deny check advisories bans sources          # 依賴漏洞
 | workflow 安全 | 權限過寬、模板注入、未釘 SHA 的 action | 照 zizmor 訊息改 `.github/`（本機：`uvx zizmor .github/`） |
 | 金鑰外洩 | commit 裡的 token、金鑰 | 撤銷那把金鑰，再從歷史移除 |
 | 結構與內容規則 | vendor 雜湊、預渲染過期、Rust↔JS／CSS 契約、連結、圖片、禁用詞、文件路徑 | 錯誤訊息會寫修法 |
-| 建置＋E2E＋Lighthouse | wasm gzip ≤ 130 KB、頁面開得起來、console 零錯誤、高度讀數、目錄開關；Lighthouse 無障礙／最佳實務／SEO 滿分（效能只列報告） | 看 log、artifact 的截圖與 Lighthouse HTML 報告 |
+| 建置＋E2E＋Lighthouse | wasm gzip ≤ 130 KB、頁面開得起來、console 零錯誤、高度讀數、目錄開關；文字疊在 3D 背景上的真實對比（WCAG AA）；Lighthouse 無障礙／最佳實務／SEO 滿分（效能只列報告） | 看 log、artifact 的截圖與 Lighthouse HTML 報告；對比不足就調暗那個位置的 3D 背景，或加深 `src/style/site.css` 的文字遮罩 |
 | 發佈 | 只在 push 到 main 或手動觸發時跑 | |
 | 驗證線上網站 | 等 CDN 換上這次的 wasm，再對正式網址跑 E2E | 看 artifact `screenshots-live`；常見是 Pages 來源不是 GitHub Actions |
 
