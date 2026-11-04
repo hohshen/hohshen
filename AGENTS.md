@@ -33,6 +33,7 @@
 ## 本機驗證
 
 ```sh
+./preview.sh                                      # 建置並在 http://localhost:8765/ 預覽（不要直接開 index.html）
 ./build.sh                                        # 預渲染 → trunk build → dist/
 cargo test --features ssr --test site_rules       # 結構測試與內容規則
 node tests/e2e/smoke.mjs                          # E2E 冒煙測試＋效能預算（需要 Chrome）

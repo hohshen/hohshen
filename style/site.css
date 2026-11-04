@@ -32,6 +32,8 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 .link:hover{color:var(--atmo)}
 .link:hover::after{transform:scaleX(0);transform-origin:right}
 
+#dev-hint{display:none !important}   /* 範本提示：只在直接開 index.html（沒有這份 CSS）時看得到 */
+
 /* 畫布與層 */
 #webgl{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 body.no-webgl #webgl{display:none}
