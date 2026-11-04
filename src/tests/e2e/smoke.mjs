@@ -131,7 +131,9 @@ async function run({ tag, width, height, reduce }) {
       // 走使用者的路徑：點導覽的「寫作」（桌面由 Lenis 平滑捲動），等高度讀數到位，最多 8 秒
       document.querySelector('a[href="#writing"]').click();
       const hud = () => document.getElementById('hudKm').textContent;
-      for (let i = 0; i < 80 && hud() !== '400 km'; i++) { dispatchEvent(new Event('scroll')); await s(100); }
+      const nav = () => [...document.querySelectorAll('.nav ul a')].filter((a) => a.getAttribute('aria-current') === 'true').map((a) => a.textContent).join(',');
+      // Lenis 減速滑動時讀數會先到位、導覽稍後才更新：兩者都到位才算
+      for (let i = 0; i < 100 && (hud() !== '400 km' || nav() !== '寫作'); i++) { dispatchEvent(new Event('scroll')); await s(100); }
       await s(300);
       const out = {
         hud: document.getElementById('hudKm').textContent + ' / ' + document.getElementById('hudName').textContent,

@@ -218,10 +218,17 @@ jobs:
           echo "::error::5 分鐘後線上仍不是這次建置的 $WASM。到 Settings → Pages 確認來源是 GitHub Actions，或看 deploy job 的 log"
           exit 1
 
+      # CDN 換版期間個別檔案可能短暫 503：失敗就隔 30 秒重跑，最多 3 次
       - name: 對正式網址跑 E2E
         env:
           SMOKE_URL: ${{ env.SITE }}
-        run: node tests/e2e/smoke.mjs
+        run: |
+          for i in 1 2 3; do
+            node tests/e2e/smoke.mjs && exit 0
+            [ "$i" -lt 3 ] && { echo "::warning::第 $i 次線上 E2E 失敗，30 秒後重試（CDN 換版期間可能短暫 503）"; sleep 30; }
+          done
+          echo "::error::線上 E2E 連續 3 次失敗：線上網站可能真的壞了，看 artifact screenshots-live 與上面的 log"
+          exit 1
 
       - name: 上傳截圖
         if: always()
