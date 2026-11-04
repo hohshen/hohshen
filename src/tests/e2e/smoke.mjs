@@ -1,8 +1,8 @@
 // E2E 冒煙測試＋效能預算。零依賴：Node 內建 http／zlib／WebSocket，直接走 Chrome DevTools Protocol。
 //
-//   ./build.sh && node tests/e2e/smoke.mjs            # 測 dist/
-//   CHROME=/path/to/chrome node tests/e2e/smoke.mjs    # 指定 Chrome
-//   SMOKE_URL=https://hohshen.github.io/hohshen/ node tests/e2e/smoke.mjs   # 測線上網站（不跑本機伺服器與體積預算）
+//   cd src && ./build.sh && node tests/e2e/smoke.mjs            # 測 dist/
+//   CHROME=/path/to/chrome node src/tests/e2e/smoke.mjs    # 指定 Chrome
+//   SMOKE_URL=https://hohshen.github.io/hohshen/ node src/tests/e2e/smoke.mjs   # 測線上網站（不跑本機伺服器與體積預算）
 //
 // 在 /hohshen/ 子路徑伺服 dist/（模擬 GitHub Pages），用無頭 Chrome 跑三種設定：
 // 桌面 1440×900、手機 390×844、減少動態效果。截圖存到 tests/e2e/out/。
@@ -50,7 +50,7 @@ const wasm = fs.readdirSync(DIST).find((f) => f.endsWith('_bg.wasm'));
 const gz = zlib.gzipSync(fs.readFileSync(path.join(DIST, wasm)), { level: 9 }).length / 1024;
 gz <= HARD.wasmGzipKB
   ? pass(`wasm gzip ${gz.toFixed(1)} KB ≤ ${HARD.wasmGzipKB} KB`)
-  : fail(`wasm gzip ${gz.toFixed(1)} KB 超過 ${HARD.wasmGzipKB} KB：檢查是否新增了大型依賴（cargo tree），或確認 Cargo.toml 的 release profile 仍是 opt-level="z"、lto=true`);
+  : fail(`wasm gzip ${gz.toFixed(1)} KB 超過 ${HARD.wasmGzipKB} KB：檢查是否新增了大型依賴（cargo tree），或確認 src/Cargo.toml 的 release profile 仍是 opt-level="z"、lto=true`);
 }
 
 // ── 靜態伺服器：/hohshen/ → dist/ ──
@@ -116,10 +116,10 @@ async function run({ tag, width, height, reduce }) {
       if (state?.intro) { introAt = Date.now() - t0; break; }
       await sleep(200);
     }
-    introAt !== null ? pass(`開場收尾（body.intro-done）${introAt} ms`) : fail(`${tag}：${HARD.introMs / 1000} 秒內沒有出現 body.intro-done。看 console 錯誤；常見原因是 scene.js 載入失敗（檢查 js/bridge.js 的路徑與 Trunk 的 copy-file）`);
+    introAt !== null ? pass(`開場收尾（body.intro-done）${introAt} ms`) : fail(`${tag}：${HARD.introMs / 1000} 秒內沒有出現 body.intro-done。看 console 錯誤；常見原因是 scene.js 載入失敗（檢查 src/js/bridge.js 的路徑與 Trunk 的 copy-file）`);
     state?.sections === 9 ? pass('#app 有 9 個 section') : fail(`${tag}：#app 的 section 數是 ${state?.sections}，應為 9。Leptos 沒掛上或元件少了一章，看 console 的 panic 訊息`);
     if (reduce) {
-      state && !state.warp ? pass('減少動態效果：沒有開場動畫') : fail(`${tag}：減少動態效果時不該有 #warp。檢查 src/warp.rs 的 reduce 分支`);
+      state && !state.warp ? pass('減少動態效果：沒有開場動畫') : fail(`${tag}：減少動態效果時不該有 #warp。檢查 src/rust/warp.rs 的 reduce 分支`);
     } else if (warpGoneAt !== null) {
       warpGoneAt <= SOFT.warpGoneMs ? pass(`開場 canvas 移除 ${warpGoneAt} ms`) : warn(`${tag}：開場 canvas ${warpGoneAt} ms 才移除（目標 ≤ ${SOFT.warpGoneMs} ms）。CI 是軟體 GPU，僅供參考；實機請用手機確認`);
     }
@@ -144,11 +144,11 @@ async function run({ tag, width, height, reduce }) {
       return out;
     })()`);
     await shot('writing');
-    r?.hud === '400 km / 低地軌道' ? pass('高度讀數：400 km / 低地軌道') : fail(`${tag}：寫作章的高度讀數是「${r?.hud}」，應為「400 km / 低地軌道」。檢查 src/dom.rs 的 watch_hud 與各 section 的 data-km`);
-    r?.nav === '寫作' ? pass('導覽標示目前章：寫作') : fail(`${tag}：導覽標示的是「${r?.nav}」，應為「寫作」。檢查 src/dom.rs 的 watch_nav`);
-    r?.open && r?.closed ? pass('手機目錄可開可關') : fail(`${tag}：手機目錄開關異常（open=${r?.open}, closed=${r?.closed}）。檢查 src/lib.rs 的 Nav`);
+    r?.hud === '400 km / 低地軌道' ? pass('高度讀數：400 km / 低地軌道') : fail(`${tag}：寫作章的高度讀數是「${r?.hud}」，應為「400 km / 低地軌道」。檢查 src/rust/dom.rs 的 watch_hud 與各 section 的 data-km`);
+    r?.nav === '寫作' ? pass('導覽標示目前章：寫作') : fail(`${tag}：導覽標示的是「${r?.nav}」，應為「寫作」。檢查 src/rust/dom.rs 的 watch_nav`);
+    r?.open && r?.closed ? pass('手機目錄可開可關') : fail(`${tag}：手機目錄開關異常（open=${r?.open}, closed=${r?.closed}）。檢查 src/rust/lib.rs 的 Nav`);
     pageErrors.length === 0 ? pass('console 零錯誤') : fail(`${tag}：console 錯誤 ${pageErrors.length} 則：${pageErrors.slice(0, 3).join(' | ')}`);
-    httpErrors.length === 0 ? pass('HTTP 零失敗') : fail(`${tag}：資源載入失敗：${httpErrors.slice(0, 3).join(' | ')}。檢查 index.html 的 data-trunk 複製設定與相對路徑`);
+    httpErrors.length === 0 ? pass('HTTP 零失敗') : fail(`${tag}：資源載入失敗：${httpErrors.slice(0, 3).join(' | ')}。檢查 src/index.html 的 data-trunk 複製設定與相對路徑`);
     ws.close();
   } finally {
     const exited = new Promise((r) => chrome.once('exit', r));
