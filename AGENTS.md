@@ -45,7 +45,7 @@ cargo deny check advisories bans sources          # 依賴漏洞
 | job | 擋什麼 | 失敗怎麼修 |
 |---|---|---|
 | 依賴漏洞 | RustSec 公告、非 crates.io 來源、yanked 版本 | `cargo update -p <crate>`；確定不影響才在 `deny.toml` 的 ignore 加一筆並寫理由 |
-| workflow 安全 | 權限過寬、模板注入、未釘 SHA 的 action | 照 zizmor 訊息改 `.github/workflows/` |
+| workflow 安全 | 權限過寬、模板注入、未釘 SHA 的 action | 照 zizmor 訊息改 `.github/`（本機：`uvx zizmor .github/`） |
 | 金鑰外洩 | commit 裡的 token、金鑰 | 撤銷那把金鑰，再從歷史移除 |
 | 結構與內容規則 | vendor 雜湊、預渲染過期、Rust↔JS／CSS 契約、連結、圖片、禁用詞、文件路徑 | 錯誤訊息會寫修法 |
 | 建置＋E2E | wasm gzip ≤ 130 KB、頁面開得起來、console 零錯誤、高度讀數、目錄開關 | 看 log 與 artifact 的截圖 |

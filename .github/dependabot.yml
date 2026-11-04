@@ -1,10 +1,13 @@
 # 每週檢查 Rust 依賴與 GitHub Actions 的新版本，自動開 PR；PR 會跑完整檢查但不發佈。
+# cooldown：新版本發布滿 7 天才開 PR，避開剛發布就被下毒的版本（供應鏈攻擊）。
 version: 2
 updates:
   - package-ecosystem: cargo
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     groups:
       rust:
         patterns: ["*"]
@@ -12,6 +15,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns: ["*"]
