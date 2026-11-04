@@ -1,0 +1,44 @@
+[package]
+name = "hohshen-site"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+# 網站本體：Leptos CSR 編成 wasm，由 trunk 建置（index.html 的 data-bin）
+[[bin]]
+name = "web"
+path = "src/main.rs"
+required-features = ["csr"]
+
+# 建置前把同一份元件以 SSR 輸出，寫進 index.html 的預渲染區（給不跑 JS 的爬蟲）
+[[bin]]
+name = "prerender"
+path = "src/bin/prerender.rs"
+required-features = ["ssr"]
+
+[features]
+csr = ["leptos/csr"]
+ssr = ["leptos/ssr"]
+
+[dependencies]
+leptos = "0.8"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+console_error_panic_hook = "0.1"
+web-sys = { version = "0.3", features = [
+  "Window", "Document", "Element", "HtmlElement", "HtmlCanvasElement", "Node", "NodeList", "DomTokenList", "DomRect",
+  "CanvasRenderingContext2d", "CanvasGradient", "Performance", "MediaQueryList",
+  "Event", "EventTarget", "AddEventListenerOptions",
+  "IntersectionObserver", "IntersectionObserverEntry", "IntersectionObserverInit",
+  "console",
+] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"

@@ -1,0 +1,56 @@
+# 建置並發佈到 GitHub Pages：Leptos（trunk）→ dist/ → Pages。
+# repo 的 Settings → Pages → Source 必須是「GitHub Actions」。
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: 安裝 trunk 0.22.1
+        run: curl -fsSL https://github.com/trunk-rs/trunk/releases/download/v0.22.1/trunk-x86_64-unknown-linux-gnu.tar.gz | sudo tar -xz -C /usr/local/bin trunk
+
+      - name: 檢查預渲染與元件一致
+        run: |
+          cargo run -q --locked --features ssr --bin prerender
+          git diff --exit-code index.html || { echo "::error::index.html 的預渲染內容過期，請在本機跑 ./build.sh 後一起 commit"; exit 1; }
+
+      - name: 建置
+        run: trunk build --release --locked
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,5 @@
+[build]
+target = "index.html"
+dist = "dist"
+# 相對路徑：本機根目錄與 GitHub Pages 的 /hohshen/ 子路徑都能用
+public_url = "./"
