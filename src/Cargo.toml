@@ -5,18 +5,18 @@ edition = "2021"
 publish = false
 
 [lib]
-path = "src/lib.rs"
+path = "rust/lib.rs"
 
 # 網站本體：Leptos CSR 編成 wasm，由 trunk 建置（index.html 的 data-bin）
 [[bin]]
 name = "web"
-path = "src/main.rs"
+path = "rust/main.rs"
 required-features = ["csr"]
 
 # 建置前把同一份元件以 SSR 輸出，寫進 index.html 的預渲染區（給不跑 JS 的爬蟲）
 [[bin]]
 name = "prerender"
-path = "src/bin/prerender.rs"
+path = "rust/bin/prerender.rs"
 required-features = ["ssr"]
 
 [features]

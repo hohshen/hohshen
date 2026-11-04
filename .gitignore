@@ -3,6 +3,6 @@ docs/
 archive/
 target/
 dist/
-tests/e2e/out/
+src/tests/e2e/out/
 lhci/
 .lighthouseci/

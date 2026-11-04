@@ -1,9 +1,9 @@
 //! 後端里長伯 Hohshen 個人站（Leptos）。
 //!
 //! - 頁面結構、導覽、手機目錄、高度讀數、標題揭示、標語逐句亮起、躍遷開場：本 crate。
-//! - 3D 場景與捲動動畫（Three.js、GSAP、Lenis）：`js/scene.js`，頁面掛載後由 `boot()` 動態載入。
+//! - 3D 場景與捲動動畫（Three.js、GSAP、Lenis）：`src/js/scene.js`，頁面掛載後由 `boot()` 動態載入。
 //!
-//! 同一組元件也以 SSR 輸出成 index.html 的預渲染內容（`src/bin/prerender.rs`）；
+//! 同一組元件也以 SSR 輸出成 index.html 的預渲染內容（`src/rust/bin/prerender.rs`）；
 //! 瀏覽器端的程式都放在 Effect 或 `boot()` 裡，SSR 不會執行到。
 
 pub mod content;

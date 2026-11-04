@@ -28,6 +28,7 @@ jobs:
           persist-credentials: false
       - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1
         with:
+          manifest-path: src/Cargo.toml
           command: check advisories bans sources
 
   workflow-lint:
@@ -56,6 +57,9 @@ jobs:
   checks:
     name: 結構與內容規則
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -64,18 +68,20 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: src -> target
 
       - name: vendor 與 js 檔案未被竄改
         run: |
           sha256sum -c --quiet vendor/SHA256SUMS || {
-            echo "::error::vendor/ 或 js/ 的檔案與 vendor/SHA256SUMS 不符。若是刻意修改或升級，請執行 ./scripts/vendor-sums.sh 並把 vendor/SHA256SUMS 一起 commit"
+            echo "::error::vendor/ 或 js/ 的檔案與 vendor/SHA256SUMS 不符。若是刻意修改或升級，請執行 src/scripts/vendor-sums.sh 並把 vendor/SHA256SUMS 一起 commit"
             exit 1
           }
 
       - name: 預渲染與元件一致
         run: |
           cargo run -q --locked --features ssr --bin prerender
-          git diff --exit-code index.html || { echo "::error::index.html 的預渲染內容過期，請在本機跑 ./build.sh 後一起 commit"; exit 1; }
+          git diff --exit-code index.html || { echo "::error::index.html 的預渲染內容過期，請在本機跑 src/build.sh 後一起 commit"; exit 1; }
 
       - name: 結構測試與內容規則
         env:
@@ -91,6 +97,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       wasm: ${{ steps.wasm.outputs.name }}
+    defaults:
+      run:
+        working-directory: src
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -100,6 +109,8 @@ jobs:
           toolchain: stable
           targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: src -> target
 
       - name: 安裝 trunk 0.22.1（驗 sha256）
         run: |
@@ -124,7 +135,7 @@ jobs:
           CHROME_PATH: /usr/bin/google-chrome
         run: |
           npx -y @lhci/cli@0.15.1 autorun || {
-            echo "::error::Lighthouse 門檻未過。下載 artifact lighthouse 的 HTML 報告看哪一項扣分；常見是文字對比（style/site.css 的 --ice-2／--ice-3）或缺 alt"
+            echo "::error::Lighthouse 門檻未過。下載 artifact lighthouse 的 HTML 報告看哪一項扣分；常見是文字對比（src/style/site.css 的 --ice-2／--ice-3）或缺 alt"
             exit 1
           }
 
@@ -147,7 +158,7 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: lighthouse
-          path: lhci/
+          path: src/lhci/
           retention-days: 7
           if-no-files-found: ignore
 
@@ -156,7 +167,7 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: screenshots
-          path: tests/e2e/out/
+          path: src/tests/e2e/out/
           retention-days: 7
           if-no-files-found: ignore
 
@@ -166,7 +177,7 @@ jobs:
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         if: github.event_name != 'pull_request'
         with:
-          path: dist
+          path: src/dist
 
   deploy:
     name: 發佈
@@ -187,6 +198,9 @@ jobs:
     name: 驗證線上網站
     needs: [build, deploy]
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
     env:
       SITE: https://hohshen.github.io/hohshen/
       WASM: ${{ needs.build.outputs.wasm }}
@@ -214,6 +228,6 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: screenshots-live
-          path: tests/e2e/out/
+          path: src/tests/e2e/out/
           retention-days: 7
           if-no-files-found: ignore

@@ -1,10 +1,10 @@
 //! 結構測試與內容規則。把 App 以 SSR 渲染成 HTML，再檢查：
-//! 1. Rust↔JS 契約：js/scene.js 用到的 id／class 都在頁面上
-//! 2. Rust↔CSS 契約：style/site.css 用到的 #id 都在頁面上
+//! 1. Rust↔JS 契約：src/js/scene.js 用到的 id／class 都在頁面上
+//! 2. Rust↔CSS 契約：src/style/site.css 用到的 #id 都在頁面上
 //! 3. 開新分頁的外部連結都帶 rel="noopener"
 //! 4. <img> 都有 alt、width、height
 //! 5. 頁內錨點 href="#x" 都對得到 id
-//! 6. 禁用詞：公開清單 tests/forbidden-public.txt ＋ 不公開清單（環境變數 FORBIDDEN_TERMS 或本機 docs/forbidden.txt）
+//! 6. 禁用詞：公開清單 src/tests/forbidden-public.txt ＋ 不公開清單（環境變數 FORBIDDEN_TERMS 或本機 docs/forbidden.txt）
 //! 7. JSON-LD（Person）：格式正確，網址與 og:url 一致，圖片存在，頁尾的社群連結都列在 sameAs
 //!
 //! 每條失敗訊息都寫明怎麼修。執行：cargo test --features ssr --test site_rules
@@ -61,7 +61,7 @@ fn scene_js_selectors_exist() {
             let sel = sel.trim();
             if is_id_call {
                 if !ids.contains(sel) {
-                    problems.push(format!("scene.js 用 getElementById('{sel}')，但頁面沒有 id=\"{sel}\"：請在 src/lib.rs 補上這個 id，或同步修改 js/scene.js"));
+                    problems.push(format!("scene.js 用 getElementById('{sel}')，但頁面沒有 id=\"{sel}\"：請在 src/rust/lib.rs 補上這個 id，或同步修改 src/js/scene.js"));
                 }
                 continue;
             }
@@ -69,7 +69,7 @@ fn scene_js_selectors_exist() {
                 let name = &tok[2];
                 let ok = if &tok[1] == "#" { ids.contains(name) } else { classes.contains(name) };
                 if !ok {
-                    problems.push(format!("scene.js 的選擇器 '{sel}' 用到 {}{name}，但 Rust 頁面沒有：請在 src/lib.rs 補上，或同步修改 js/scene.js", &tok[1]));
+                    problems.push(format!("scene.js 的選擇器 '{sel}' 用到 {}{name}，但 Rust 頁面沒有：請在 src/rust/lib.rs 補上，或同步修改 src/js/scene.js", &tok[1]));
                 }
             }
         }
@@ -86,7 +86,7 @@ fn css_ids_exist() {
     let mut problems = Vec::new();
     for cap in Regex::new(r"#([A-Za-z][\w-]*)").unwrap().captures_iter(&selectors) {
         if !ids.contains(&cap[1]) {
-            problems.push(format!("style/site.css 有 #{} 的樣式，但頁面沒有這個 id：刪掉這段樣式，或在 src/lib.rs 補上 id", &cap[1]));
+            problems.push(format!("src/style/site.css 有 #{} 的樣式，但頁面沒有這個 id：刪掉這段樣式，或在 src/rust/lib.rs 補上 id", &cap[1]));
         }
     }
     problems.dedup();
@@ -100,7 +100,7 @@ fn external_links_have_noopener() {
     for a in Regex::new(r"<a\s[^>]*>").unwrap().find_iter(&html) {
         let tag = a.as_str();
         if tag.contains(r#"target="_blank""#) && !tag.contains("noopener") {
-            problems.push(format!("{tag} 開新分頁但沒有 rel=\"noopener\"：在 src/lib.rs 這個連結加上 rel=\"noopener\""));
+            problems.push(format!("{tag} 開新分頁但沒有 rel=\"noopener\"：在 src/rust/lib.rs 這個連結加上 rel=\"noopener\""));
         }
     }
     report(problems, "外部連結缺 noopener");
@@ -114,7 +114,7 @@ fn images_have_alt_and_size() {
         let tag = img.as_str();
         let alt_ok = Regex::new(r#"\salt="[^"]+""#).unwrap().is_match(tag);
         if !alt_ok || !tag.contains(" width=") || !tag.contains(" height=") {
-            problems.push(format!("{tag}：圖片必須有非空的 alt 與 width、height（避免版面跳動、讓螢幕閱讀器讀得到）。到 src/content.rs 的 PLATES 或 src/lib.rs 補上"));
+            problems.push(format!("{tag}：圖片必須有非空的 alt 與 width、height（避免版面跳動、讓螢幕閱讀器讀得到）。到 src/rust/content.rs 的 PLATES 或 src/rust/lib.rs 補上"));
         }
     }
     report(problems, "圖片屬性不完整");
@@ -127,7 +127,7 @@ fn anchors_point_to_existing_ids() {
     let mut problems = Vec::new();
     for cap in Regex::new(r##"href="#([^"]+)""##).unwrap().captures_iter(&html) {
         if !ids.contains(&cap[1]) {
-            problems.push(format!("連結 href=\"#{}\" 找不到對應的 id：改成存在的章節 id（見 src/content.rs 的 NAV），或補上該章節", &cap[1]));
+            problems.push(format!("連結 href=\"#{}\" 找不到對應的 id：改成存在的章節 id（見 src/rust/content.rs 的 NAV），或補上該章節", &cap[1]));
         }
     }
     problems.dedup();
@@ -142,13 +142,13 @@ fn no_forbidden_terms() {
         .lines()
         .map(str::trim)
         .filter(|l| !l.is_empty())
-        .map(|l| (l.to_string(), "公開清單 tests/forbidden-public.txt"))
+        .map(|l| (l.to_string(), "公開清單 src/tests/forbidden-public.txt"))
         .collect();
     let private = std::env::var("FORBIDDEN_TERMS")
         .ok()
         .filter(|s| !s.trim().is_empty())
         .map(|s| (s, "不公開清單（FORBIDDEN_TERMS）"))
-        .or_else(|| std::fs::read_to_string(Path::new(ROOT).join("docs/forbidden.txt")).ok().map(|s| (s, "不公開清單（docs/forbidden.txt）")));
+        .or_else(|| std::fs::read_to_string(Path::new(ROOT).join("../docs/forbidden.txt")).ok().map(|s| (s, "不公開清單（docs/forbidden.txt）")));
     match &private {
         Some((list, src)) => terms.extend(list.lines().map(str::trim).filter(|l| !l.is_empty()).map(|l| (l.to_string(), *src))),
         None => eprintln!("提示：沒有設定不公開禁用詞（GitHub secret FORBIDDEN_TERMS 或本機 docs/forbidden.txt），只檢查公開清單"),
@@ -158,7 +158,7 @@ fn no_forbidden_terms() {
         if text.contains(term.as_str()) {
             // 不公開的詞不印出原文，只印第幾個字元起，避免 CI log 洩漏
             let shown = if src.starts_with("公開") { format!("「{term}」") } else { format!("一個不公開詞（{} 個字）", term.chars().count()) };
-            problems.push(format!("頁面出現{shown}，來源：{src}。請到 src/content.rs 或 index.html 移除"));
+            problems.push(format!("頁面出現{shown}，來源：{src}。請到 src/rust/content.rs 或 src/index.html 移除"));
         }
     }
     report(problems, "出現禁用詞");
