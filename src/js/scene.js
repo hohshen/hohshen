@@ -248,7 +248,7 @@ if (webgl){
   const e1 = sunDir.clone().negate(), e2 = new THREE.Vector3().crossVectors(ecl, e1).normalize();
   const onOrbit = (r, ang, out) => out.copy(sunPos).addScaledVector(e1, Math.cos(ang) * r).addScaledVector(e2, Math.sin(ang) * r);
   /* 視線稍微偏開銀河核心，讓核心落在畫面一側、太陽在中間 */
-  sysCam = sunPos.clone().addScaledVector(gC.clone().addScaledVector(e2, 0.55).addScaledVector(ecl, -0.15).normalize(), -720);
+  sysCam = sunPos.clone().addScaledVector(gC.clone().addScaledVector(e2, -0.55).addScaledVector(ecl, 0.15).normalize(), -720);
   sysLook = sunPos.clone();
   solar = new THREE.Group(); solar.visible = false; scene.add(solar);
   const NOISE = `float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,37.719))) * 43758.5453); }
@@ -294,7 +294,7 @@ if (webgl){
   orbitLines = [22, 37, SUN_D, 78, 128, 178, 226, 270].map((r) => {
     const pts = []; const v = new THREE.Vector3(); for (let i = 0; i <= 256; i++){ onOrbit(r, (i / 256) * Math.PI * 2, v); pts.push(v.clone()); }
     const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: r === SUN_D ? 0x7fc4ff : 0x9fb4cc, transparent: true, opacity: 0, depthWrite: false }));
-    l.userData.max = r === SUN_D ? 0.85 : 0.38; solar.add(l); return l;
+    l.userData.max = r === SUN_D ? 0.6 : 0.3; solar.add(l); return l;
   });
   /* 小行星帶 */
   {
