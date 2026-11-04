@@ -2,7 +2,7 @@
 <!--
   後端里長伯 Hohshen 個人站 Rev.9
   需以 HTTP 伺服（ES module importmap；three / gsap / lenis 已 vendor 在 ./vendor）：
-    cd .site/prototype && python3 -m http.server 8765 → http://localhost:8765/
+    cd sites/hohshen-site && python3 -m http.server 8765 → http://localhost:8765/
 -->
 <html lang="zh-Hant-TW">
 <head>
@@ -67,10 +67,10 @@ body.no-webgl{background:radial-gradient(120% 60% at 50% 110%,#13223A 0%,var(--v
 main{position:relative;z-index:1}
 
 /* 載入 */
-#preloader{position:fixed;inset:0;z-index:9000;background:var(--void);display:flex;align-items:flex-end;justify-content:space-between;padding:var(--pad);transition:opacity .8s var(--ease-io),visibility .8s}
-#preloader.done{opacity:0;visibility:hidden}
-#preloader .pct{font-size:clamp(4rem,14vw,12rem)}
-#preloader .pl{align-self:flex-start}
+#warp{position:fixed;inset:0;width:100%;height:100%;z-index:9000;pointer-events:none;background:var(--void);transition:opacity .45s var(--ease-out)}
+#warp.done{opacity:0}
+#warp:not(.done){animation:warp-out .45s var(--ease-out) 2.55s forwards}   /* 保險：主執行緒被 three.js 初始化卡住時，合成器仍會在 3 秒內淡出 */
+@keyframes warp-out{to{opacity:0}}
 
 /* 導覽 */
 .nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:calc(var(--pad) * .5) var(--pad);mix-blend-mode:difference;opacity:0;transform:translateY(-8px);transition:opacity .8s var(--ease-out) .2s,transform .8s var(--ease-out) .2s}
@@ -270,11 +270,60 @@ window.addEventListener('unhandledrejection', function(e){ console.error('[site]
 </head>
 <body>
 
-<div id="preloader" aria-hidden="true">
-  <div class="pl small">後端里長伯 Hohshen<br>發射前檢查</div>
-  <div class="pct num" id="pct">0</div>
-</div>
-
+<canvas id="warp" aria-hidden="true"></canvas>
+<script>
+/* 開場：深空躍遷回發射台。不依賴 WebGL，three 還在載入時就開始播；任何操作都可略過 */
+(function(){
+  var cv = document.getElementById('warp');
+  var ready = null, ended = false, faded = false, raf = 0;
+  function fire(){ if (ended && ready){ var f = ready; ready = null; f(); } }
+  window.__warpIntro = function(fn){ ready = fn; fire(); };
+  function fade(){ if (faded) return; faded = true; ended = true; fire(); cv.classList.add('done'); setTimeout(function(){ cancelAnimationFrame(raf); cv.remove(); }, 460); }
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches){ cv.remove(); ended = true; return; }
+  ['pointerdown', 'wheel', 'touchstart', 'keydown'].forEach(function(ev){ addEventListener(ev, fade, { once: true, passive: true }); });
+  var ctx = cv.getContext('2d'), DPR = Math.min(devicePixelRatio || 1, 2), W, H, CX, CY, F;
+  function size(){ W = innerWidth; H = innerHeight; cv.width = W * DPR; cv.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); CX = W / 2; CY = H * 0.46; F = Math.max(W, H) * 0.5; }
+  size(); addEventListener('resize', size);
+  var N = innerWidth < 720 ? 380 : 760, S = [];
+  function seed(st, far){ var a = Math.random() * Math.PI * 2, r = 0.06 + Math.pow(Math.random(), 0.7) * 1.6; st.x = Math.cos(a) * r; st.y = Math.sin(a) * r; st.z = far ? 2.2 + Math.random() * 0.6 : 0.15 + Math.random() * 2.6; st.pz = st.z; st.c = Math.random() < 0.28 ? '127,196,255' : (Math.random() < 0.12 ? '255,214,170' : '220,232,245'); st.w = 0.5 + Math.random() * 1.1; return st; }
+  for (var i = 0; i < N; i++) S.push(seed({}, false));
+  var t0 = performance.now(), last = t0, flashT = -1;
+  ctx.fillStyle = '#06080F'; ctx.fillRect(0, 0, W, H);
+  function speed(t){ if (t < 0.35) return 0.12; var k = Math.min(1, (t - 0.35) / 0.75); return 0.12 + k * k * k * 4.2; }
+  function frame(now){
+    var t = (now - t0) / 1000, dt = Math.min(0.05, (now - last) / 1000); last = now;
+    var v = speed(t), warp = Math.min(1, Math.max(0, (t - 0.35) / 0.75));
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = 'rgba(6,8,15,' + (0.55 - warp * 0.3) + ')'; ctx.fillRect(0, 0, W, H);
+    /* 中心的星雲光暈，躍遷時變亮 */
+    var g = ctx.createRadialGradient(CX, CY, 0, CX, CY, F * (0.5 + warp * 0.6));
+    g.addColorStop(0, 'rgba(127,196,255,' + (0.05 + warp * 0.16) + ')'); g.addColorStop(0.4, 'rgba(60,70,160,' + (0.03 + warp * 0.06) + ')'); g.addColorStop(1, 'rgba(6,8,15,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+    for (var i = 0; i < S.length; i++){
+      var st = S[i]; st.pz = st.z; st.z -= v * dt;
+      if (st.z <= 0.02){ seed(st, true); continue; }
+      var sx = CX + st.x / st.z * F, sy = CY + st.y / st.z * F;
+      if (sx < -60 || sx > W + 60 || sy < -60 || sy > H + 60){ seed(st, true); continue; }
+      var px = CX + st.x / st.pz * F, py = CY + st.y / st.pz * F;
+      var a = Math.min(1, (2.8 - st.z) * 0.6) * (0.55 + warp * 0.45), lw = st.w * (1 + (1 / st.z) * 0.35);
+      ctx.strokeStyle = 'rgba(' + st.c + ',' + a + ')'; ctx.lineWidth = lw;
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(sx + (sx === px ? 0.01 : 0), sy); ctx.stroke();
+    }
+    /* 躍遷完成：等場景就緒後閃光 */
+    if (t > 1.1 && flashT < 0 && (ready || t > 2.3)) flashT = t;   /* 場景最多等到 2.3 秒；閃光 0.22 秒＋淡出 0.45 秒，整段 3 秒內結束 */
+    if (flashT >= 0){
+      var k = (t - flashT) / 0.22, R = F * (0.15 + Math.min(k, 1.4) * 2.2), fa = k <= 1 ? k : Math.max(0, 1 - (k - 1) * 1.6);
+      var fg = ctx.createRadialGradient(CX, CY, 0, CX, CY, R);
+      fg.addColorStop(0, 'rgba(255,255,255,' + fa * 0.5 + ')'); fg.addColorStop(0.3, 'rgba(180,222,255,' + fa * 0.32 + ')'); fg.addColorStop(1, 'rgba(127,196,255,0)');
+      ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = fg; ctx.fillRect(0, 0, W, H);
+      if (k >= 1) fade();
+    }
+    if (!faded || cv.isConnected) raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+})();
+</script>
 <canvas id="webgl" aria-hidden="true"></canvas>
 <div class="cursor" id="cursor" aria-hidden="true"><div class="ring"></div><div class="dot"></div></div>
 
@@ -425,10 +474,6 @@ window.addEventListener('unhandledrejection', function(e){ console.error('[site]
   <div class="l">
     <div>後端里長伯 Hohshen（何勝）</div>
     <div class="rev">
-      <span>Rev.9，2026-11-03：改以 Three.js 實作地球升軌、ACES 調色、bloom 與顆粒；Lenis 平滑捲動；Bricolage Grotesque 與 Noto Sans TC</span>
-      <span>Rev.8，2026-11-03：受控工程文件版（已撤）</span>
-      <span>Rev.5 到 Rev.7，2026-11-02 至 03：火焰橘與行星軌道版（已撤）</span>
-      <span>Rev.1，2026-11-02：首版，事實正本為履歷 2026-09-29 版</span>
       <span>本站為靜態頁面，不使用 cookie，不蒐集任何資料。</span>
     </div>
   </div>
@@ -794,11 +839,9 @@ if (fine && !reduce){
   document.querySelectorAll('.magnet').forEach(b => { b.addEventListener('mousemove', (e) => { const r = b.getBoundingClientRect(); gsap.to(b, { x: (e.clientX - r.left - r.width / 2) * 0.22, y: (e.clientY - r.top - r.height / 2) * 0.22, duration: 0.5, ease: 'power3.out' }); }); b.addEventListener('mouseleave', () => gsap.to(b, { x: 0, y: 0, duration: 0.6, ease: 'power3.out' })); });
 }
 
-/* 載入與開場 */
-const pre = document.getElementById('preloader'), pct = document.getElementById('pct');
-let n = 0; const fake = setInterval(() => { n = Math.min(100, n + (n < 70 ? 7 : 3)); pct.textContent = n; if (n >= 100){ clearInterval(fake); setTimeout(intro, reduce ? 0 : 250); } }, reduce ? 1 : 38);
+/* 開場：等躍遷動畫結束（或被略過、或 reduced motion）才收尾 */
+window.__warpIntro(intro);
 function intro(){
-  pre.classList.add('done');
   if (webgl && !reduce){ state.camZ.current = 5.2; state.camY.current = -0.4; state.lookY.current = 1.6; }
   ScrollTrigger.refresh();
   setTimeout(() => document.body.classList.add('intro-done'), reduce ? 0 : 200);
